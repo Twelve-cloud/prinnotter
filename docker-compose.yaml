@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  web:
+    build: ./InnotterDjango
+    volumes:
+      - .:/InnotterDjango/code
+    ports:
+      - 8000:8000
+    env_file:
+      - ./InnotterDjango/.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14.4-alpine
+    volumes:
+      - ./InnotterDjango/data/db:/var/lib/postgresql/data
+    env_file:
+      - ./InnotterDjango/.env
