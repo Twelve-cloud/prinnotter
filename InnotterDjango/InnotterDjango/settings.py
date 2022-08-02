@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'innotter.apps.InnotterConfig',
+    'blog.apps.BlogConfig',
     'user.apps.UserConfig'
 ]
 
