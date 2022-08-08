@@ -7,6 +7,7 @@ RUN apk update && apk add bash postgresql-dev gcc python3-dev musl-dev poetry
 
 WORKDIR /code
 COPY pyproject.toml /code
+RUN poetry config virtualenvs.in-project true
 RUN poetry install
 
 COPY . /code
