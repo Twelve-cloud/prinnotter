@@ -28,6 +28,8 @@ DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
+AUTH_USER_MODEL = 'user.User'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -36,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
-    'user.apps.UserConfig'
+    'user.apps.UserConfig',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
