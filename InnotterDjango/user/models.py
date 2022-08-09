@@ -8,7 +8,7 @@ import jwt
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, password, role):
+    def create_user(self, username, email, password, role='u'):
         if username is None:
             raise TypeError('Users must have a username.')
 
@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, email, password):
-        user = self.create_user(username, email, password)
+        user = self.create_user(username, email, password, role='a')
         user.is_superuser = True
         user.is_staff = True
         user.save()
@@ -79,7 +79,7 @@ class User(AbstractBaseUser):
     )
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'password', 'role']
+    REQUIRED_FIELDS = ['username', 'password']
     objects = UserManager()
 
     class Meta:
@@ -103,15 +103,11 @@ class User(AbstractBaseUser):
         return self._generate_refresh_token()
 
     def _generate_access_token(self):
-        dt = datetime.now() + timedelta(minutes=15)
+        dt = datetime.now() + timedelta(minutes=1)
         payload = {'id': self.pk, 'exp': int(dt.strftime('%s'))}
-        access_token = jwt.encode(payload, settings.SECRET_KEY, alg='HS256')
-
-        return access_token.decode('utf-8')
+        return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
     def _generate_refresh_token(self):
-        dt = datetime.now() + timedelta(days=1)
+        dt = datetime.now() + timedelta(minutes=2)
         payload = {'id': self.pk, 'exp': int(dt.strftime('%s'))}
-        refresh_token = jwt.encode(payload, settings.SECRET_KEY, alg='HS256')
-
-        return refresh_token.decode('utf-8')
+        return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
