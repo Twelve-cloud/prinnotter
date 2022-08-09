@@ -92,22 +92,14 @@ class User(AbstractBaseUser):
         return self.username
 
     def get_absolute_url(self):
-        return f'/user/{self.pk}/'
+        return f'/user/users/{self.pk}/'
 
-    @property
-    def access_token(self):
-        return self._generate_access_token()
-
-    @property
-    def refresh_token(self):
-        return self._generate_refresh_token()
-
-    def _generate_access_token(self):
+    def generate_access_token(self):
         dt = datetime.now() + timedelta(minutes=1)
         payload = {'id': self.pk, 'exp': int(dt.strftime('%s'))}
         return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
-    def _generate_refresh_token(self):
+    def generate_refresh_token(self):
         dt = datetime.now() + timedelta(minutes=2)
         payload = {'id': self.pk, 'exp': int(dt.strftime('%s'))}
         return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
