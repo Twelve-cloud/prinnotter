@@ -52,7 +52,6 @@ class JWTMiddleware:
 
             response = self.next(request)
 
-            user.is_auth = False
             if user.access_expired:
                 response.set_cookie(
                     'access_token',
