@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from user.serializers import (
     UserSerializer, RegistrationSerializer, LoginSerializer
@@ -11,6 +11,9 @@ from django.conf import settings
 from django.shortcuts import redirect
 from user.models import User
 from user.services import create_response
+from user.permissions import (
+    IsUserOwner, IsAdmin, IsModerator, IsUserOwnerOrAdmin
+)
 import jwt
 
 
@@ -112,3 +115,16 @@ class RefreshTokenApiView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = []
+    permission_dict = {
+        'create': (IsAdmin,),
+        'list': (IsAuthenticated,),
+        'retrieve': (IsAuthenticated,),
+        'update': (IsAuthenticated, IsUserOwnerOrAdmin),
+        'partial_update': (IsAuthenticated, IsUserOwnerOrAdmin),
+        'destroy': (IsAuthenticated, IsUserOwnerOrAdmin),
+    }
+
+    def get_permissions(self):
+        self.permission_classes = self.permission_dict.get(self.action, [])
+        return super(self.__class__, self).get_permissions()
