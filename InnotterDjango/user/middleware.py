@@ -22,6 +22,12 @@ class JWTMiddleware:
 
                 request.user = User.objects.get(pk=payload.get('id'))
 
+                if request.user.is_blocked:
+                    return create_response(
+                        data={"Error": "User is blocked"},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+
             except User.DoesNotExist:
                 return create_response(
                     data={"Error": "User is not found"},
@@ -29,10 +35,12 @@ class JWTMiddleware:
                 )
 
             except jwt.ExpiredSignatureError:
-                return create_response(
+                response = create_response(
                     data={"Error": "Unauthorized"},
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+                response.headers['WWW-Authenticate'] = 'Refresh Token'
+                return response
 
         response = self.next(request)
 
