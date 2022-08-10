@@ -52,11 +52,6 @@ class LoginSerializer(serializers.Serializer):
                 'A user with this email and password was not found.'
             )
 
-        if user.is_blocked:
-            raise serializers.ValidationError(
-                'This user has been blocked.'
-            )
-
         return {
             'email': user.email,
             'username': user.username,
@@ -94,5 +89,9 @@ class UserSerializer(serializers.ModelSerializer):
             'pages', 'follows', 'requests', 'likes'
         ]
         read_only_fields = [
-            'id', 'pages', 'follows', 'requests', 'likes'
+            'id', 'image_s3_path', 'is_blocked',
+            'pages', 'follows', 'requests', 'likes'
         ]
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
