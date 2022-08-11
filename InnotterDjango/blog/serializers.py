@@ -28,7 +28,7 @@ class PageSerializer(serializers.ModelSerializer):
             'unblock_date', 'posts'
         ]
         read_only_fields = [
-            'id', 'followers', 'follow_requests', 'posts'
+            'id', 'followers', 'follow_requests', 'unblock_date', 'posts'
         ]
 
 
