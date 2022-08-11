@@ -11,9 +11,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 from user.models import User
 from user.services import create_response
-from user.permissions import (
-    IsUserOwner, IsAdmin, IsModerator, IsUserOwnerOrAdmin
-)
+from user.permissions import IsAdmin, IsUserOwnerOrAdmin
 import jwt
 
 

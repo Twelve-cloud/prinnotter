@@ -95,11 +95,11 @@ class User(AbstractBaseUser):
         return f'/user/users/{self.pk}/'
 
     def generate_access_token(self):
-        dt = datetime.now() + timedelta(minutes=1)
+        dt = datetime.now() + timedelta(minutes=15)
         payload = {'id': self.pk, 'exp': int(dt.strftime('%s'))}
         return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
     def generate_refresh_token(self):
-        dt = datetime.now() + timedelta(minutes=2)
+        dt = datetime.now() + timedelta(days=30)
         payload = {'id': self.pk, 'exp': int(dt.strftime('%s'))}
         return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
