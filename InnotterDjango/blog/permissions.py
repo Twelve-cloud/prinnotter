@@ -20,11 +20,13 @@ class IsModerator(permissions.BasePermission):
 
 class IsPageOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        obj = obj.page if isinstance(obj, Post) else obj
         return obj.owner == request.user
 
 
 class IsPageNotPrivate(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        obj = obj.page if isinstance(obj, Post) else obj
         if IsPageOwnerOrAdminOrModerator.has_object_permission(self, request, view, obj):
             return True
         return not obj.is_private
@@ -32,6 +34,7 @@ class IsPageNotPrivate(permissions.BasePermission):
 
 class IsPageNotBlocked(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        obj = obj.page if isinstance(obj, Post) else obj
         if IsAdminOrModerator.has_permission(self, request, view):
             return True
         return obj.unblock_date is None
