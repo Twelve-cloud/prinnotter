@@ -6,7 +6,6 @@ class Tag(models.Model):
         max_length=30,
         unique=True,
         verbose_name='Name',
-        db_column='Name'
     )
 
     class Meta:
@@ -18,33 +17,29 @@ class Tag(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return f'/tag/{self.pk}/'
+        return f'/tags/{self.pk}/'
 
 
 class Page(models.Model):
     name = models.CharField(
         max_length=80,
         verbose_name='Name',
-        db_column='Name'
     )
 
     uuid = models.CharField(
         max_length=30,
         unique=True,
         verbose_name='UUID',
-        db_column='UUID'
     )
 
     description = models.TextField(
         verbose_name='Description',
-        db_column='Description'
     )
 
     tags = models.ManyToManyField(
         'blog.Tag',
         related_name='pages',
         verbose_name='Tags',
-        db_column='Tags'
     )
 
     owner = models.ForeignKey(
@@ -52,41 +47,35 @@ class Page(models.Model):
         on_delete=models.CASCADE,
         related_name='pages',
         verbose_name='Owner',
-        db_column='Owner'
     )
 
     followers = models.ManyToManyField(
         'user.User',
         related_name='follows',
         verbose_name='Followers',
-        db_column='Followers'
     )
 
     image = models.URLField(
         null=True,
         blank=True,
         verbose_name='Image',
-        db_column='Image'
     )
 
     is_private = models.BooleanField(
         default=False,
         verbose_name='Private?',
-        db_column='IsPrivate'
     )
 
     follow_requests = models.ManyToManyField(
         'user.User',
         related_name='requests',
         verbose_name='Requests',
-        db_column='Requests'
     )
 
     unblock_date = models.DateTimeField(
         null=True,
         blank=True,
         verbose_name='Unblock date',
-        db_column='UnblockDate'
     )
 
     class Meta:
@@ -99,7 +88,7 @@ class Page(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return f'/page/{self.pk}/'
+        return f'/pages/{self.pk}/'
 
 
 class Post(models.Model):
@@ -108,20 +97,17 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name='posts',
         verbose_name='Page',
-        db_column='Page'
     )
 
     content = models.CharField(
         max_length=180,
         verbose_name='Content',
-        db_column='Content'
     )
 
-    likes = models.ManyToManyField(
+    liked_posts = models.ManyToManyField(
         'user.User',
-        related_name='likes',
-        verbose_name='Likes',
-        db_column='Likes'
+        related_name='liked_posts',
+        verbose_name='Liked posts',
     )
 
     reply_to = models.ForeignKey(
@@ -130,19 +116,16 @@ class Post(models.Model):
         null=True,
         related_name='replies',
         verbose_name='Reply to',
-        db_column='ReplyTo'
     )
 
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Created at',
-        db_column='CreatedAt'
     )
 
     updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name='Updated at',
-        db_column='UpdatedAt'
     )
 
     class Meta:
@@ -155,4 +138,4 @@ class Post(models.Model):
         return f'post №{self.pk} on page {self.page.name}'
 
     def get_absolute_url(self):
-        return f'/post/{self.pk}/'
+        return f'/posts/{self.pk}/'
