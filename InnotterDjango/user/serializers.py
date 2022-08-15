@@ -89,13 +89,8 @@ class UserSerializer(serializers.ModelSerializer):
             'pages', 'follows', 'requests', 'liked_posts'
         ]
         read_only_fields = [
-<<<<<<< HEAD
             'id', 'image_s3_path', 'is_blocked',
             'pages', 'follows', 'requests', 'liked_posts'
-=======
-            'id', 'pages', 'follows', 'requests', 'liked_posts'
->>>>>>> 25a77a2 (fix: some fixes)
         ]
-
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
