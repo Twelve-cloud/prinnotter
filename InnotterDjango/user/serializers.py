@@ -55,8 +55,8 @@ class LoginSerializer(serializers.Serializer):
         return {
             'email': user.email,
             'username': user.username,
-            'access_token': user.generate_access_token(),
-            'refresh_token': user.generate_refresh_token()
+            'access_token': user.generate_token(type='access'),
+            'refresh_token': user.generate_token(type='refresh')
         }
 
 
@@ -76,7 +76,7 @@ class UserSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
-    likes = serializers.PrimaryKeyRelatedField(
+    liked_posts = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True
     )
@@ -86,11 +86,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'email', 'username', 'password',
             'role', 'image_s3_path', 'is_blocked',
-            'pages', 'follows', 'requests', 'likes'
+            'pages', 'follows', 'requests', 'liked_posts'
         ]
         read_only_fields = [
             'id', 'image_s3_path', 'is_blocked',
-            'pages', 'follows', 'requests', 'likes'
+            'pages', 'follows', 'requests', 'liked_posts'
         ]
 
     def create(self, validated_data):
