@@ -42,7 +42,7 @@ class User(AbstractUser):
         db_table = 'User'
 
     def __str__(self):
-        return self.username
+        return f'{self.id}: {self.username}'
 
     def get_absolute_url(self):
         return f'/users/{self.pk}/'

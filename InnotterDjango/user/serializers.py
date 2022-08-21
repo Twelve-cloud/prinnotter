@@ -3,28 +3,22 @@ from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        max_length=128,
-        min_length=8,
-        write_only=True
-    )
-
-    pages = serializers.PrimaryKeyRelatedField(
+    pages = serializers.StringRelatedField(
         many=True,
         read_only=True
     )
 
-    follows = serializers.PrimaryKeyRelatedField(
+    follows = serializers.StringRelatedField(
         many=True,
         read_only=True
     )
 
-    requests = serializers.PrimaryKeyRelatedField(
+    requests = serializers.StringRelatedField(
         many=True,
         read_only=True
     )
 
-    liked_posts = serializers.PrimaryKeyRelatedField(
+    liked_posts = serializers.StringRelatedField(
         many=True,
         read_only=True
     )
@@ -32,10 +26,26 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'username', 'password',
-            'role', 'image_s3_path', 'is_blocked',
-            'pages', 'follows', 'requests', 'liked_posts'
+            'id',
+            'email',
+            'username',
+            'password',
+            'role',
+            'first_name',
+            'last_name',
+            'image_s3_path',
+            'is_blocked',
+            'pages',
+            'follows',
+            'requests',
+            'liked_posts'
         ]
         read_only_fields = [
-            'id', 'pages', 'follows', 'requests', 'liked_posts'
+            'id',
+            'image_s3_path',
+            'is_blocked',
+            'pages',
+            'follows',
+            'requests',
+            'liked_posts'
         ]

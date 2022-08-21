@@ -1,13 +1,24 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from rest_framework_extensions.routers import ExtendedDefaultRouter
 from blog import views
 
 
-router = DefaultRouter()
-router.register(r'tags', views.TagViewSet)
-router.register(r'pages', views.PageViewSet)
-router.register(r'posts', views.PostViewSet)
+router = ExtendedDefaultRouter()
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+router.register(
+    prefix='tags',
+    viewset=views.TagViewSet,
+    basename='tags'
+)
+
+router.register(
+    prefix='pages',
+    viewset=views.PageViewSet,
+    basename='pages'
+).register(
+    prefix='posts',
+    viewset=views.PostViewSet,
+    basename='pages-posts',
+    parents_query_lookups=['page_id']
+)
+
+urlpatterns = router.urls
