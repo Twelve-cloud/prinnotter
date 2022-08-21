@@ -1,12 +1,8 @@
 from django.db import models
-from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser
-from datetime import datetime, timedelta
-from user.managers import UserManager
-import jwt
+from django.contrib.auth.models import AbstractUser
 
 
-class User(AbstractBaseUser):
+class User(AbstractUser):
     class Roles(models.TextChoices):
         USER = 'u', 'User'
         MODERATOR = 'm', 'Moderator'
@@ -16,12 +12,6 @@ class User(AbstractBaseUser):
     email = models.EmailField(
         unique=True,
         verbose_name='Email',
-    )
-
-    username = models.CharField(
-        max_length=32,
-        unique=True,
-        verbose_name='Username',
     )
 
     image_s3_path = models.CharField(
@@ -43,8 +33,7 @@ class User(AbstractBaseUser):
     )
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'password']
-    objects = UserManager()
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         verbose_name = 'User'
@@ -56,10 +45,4 @@ class User(AbstractBaseUser):
         return self.username
 
     def get_absolute_url(self):
-        return f'/user/users/{self.pk}/'
-
-    def generate_token(self, *, type):
-        lifetime = timedelta(minutes=15) if type == 'access' else timedelta(days=30)
-        dt = datetime.now() + lifetime
-        payload = {'id': self.pk, 'exp': int(dt.strftime('%s'))}
-        return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        return f'/users/{self.pk}/'

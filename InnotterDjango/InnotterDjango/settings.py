@@ -3,9 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-DOTENV_PATH = os.path.join(Path(__file__).resolve().parent.parent, '.env')
-
-load_dotenv(DOTENV_PATH)
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,20 +72,37 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'UserAttributeSimilarityValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'MinimumLengthValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'CommonPasswordValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'NumericPasswordValidator'
+            ),
     },
 ]
 
 NON_TOKEN_PATH = ['/user/registration/', '/user/login/', '/user/refresh/']
+
+JWT_TOKEN = {
+    'ACCESS_TOKEN_LIFETIME_MINUTES': 15,
+    'REFRESH_TOKEN_LIFETIME_DAYS': 30
+}
 
 LANGUAGE_CODE = 'en-us'
 
