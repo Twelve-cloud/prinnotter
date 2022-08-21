@@ -97,11 +97,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-NON_TOKEN_PATH = ['/user/registration/', '/user/login/', '/user/refresh/']
+NON_TOKEN_PATH = ['/user/register/', '/user/login/', '/user/refresh/']
 
 JWT_TOKEN = {
     'ACCESS_TOKEN_LIFETIME_MINUTES': 15,
-    'REFRESH_TOKEN_LIFETIME_DAYS': 30
+    'REFRESH_TOKEN_LIFETIME_DAYS': 30,
+    'ALGORITHMS': ['HS256'],
+    'SECURE': True,
+    'HTTP_ONLY': True,
 }
 
 LANGUAGE_CODE = 'en-us'

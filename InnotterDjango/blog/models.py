@@ -14,7 +14,7 @@ class Tag(models.Model):
         db_table = 'Tag'
 
     def __str__(self):
-        return self.name
+        return f'{self.id}. {self.name}'
 
     def get_absolute_url(self):
         return f'/tags/{self.pk}/'
@@ -85,7 +85,7 @@ class Page(models.Model):
         db_table = 'Page'
 
     def __str__(self):
-        return self.name
+        return f'{self.id}. {self.name}'
 
     def get_absolute_url(self):
         return f'/pages/{self.pk}/'
@@ -135,7 +135,7 @@ class Post(models.Model):
         db_table = 'Post'
 
     def __str__(self):
-        return f'post №{self.pk} on page {self.page.name}'
+        return f'id: {self.pk}, page: {self.page.name}'
 
     def get_absolute_url(self):
         return f'/posts/{self.pk}/'

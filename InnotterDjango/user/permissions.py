@@ -10,9 +10,18 @@ class IsUserOwner(permissions.BasePermission):
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        if isinstance(request.user, AnonymousUser):
-            return False
         return request.user.role == User.Roles.ADMIN
+
+
+class IsModerator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == User.Roles.MODERATOR
+
+
+class IsAdminOrModerator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return IsAdmin.has_permission(self, request, view) or \
+            IsModerator.has_permission(self, request, view)
 
 
 class IsUserOwnerOrAdmin(permissions.BasePermission):
