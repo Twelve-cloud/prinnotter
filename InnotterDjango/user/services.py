@@ -32,6 +32,7 @@ def generate_token(*, type, user_id):
         'exp': int(expiry_token_date.strftime('%s'))
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+<<<<<<< HEAD
 
 
 def set_tokens_to_cookie(response, user_id):
@@ -78,3 +79,5 @@ def create_response(data, status, rndr=None, mtype=None, cntx=None, hdrs=None):
 
     response.render()
     return response
+=======
+>>>>>>> 990ddd3 (fix: some fixes)
