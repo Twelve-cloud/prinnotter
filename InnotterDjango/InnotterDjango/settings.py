@@ -35,7 +35,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'user.middleware.JWTMiddleware'
+    'auth.middleware.JWTMiddleware'
 ]
 
 ROOT_URLCONF = 'InnotterDjango.urls'
@@ -97,7 +97,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-NON_TOKEN_PATH = ['/user/register/', '/user/login/', '/user/refresh/']
+NON_TOKEN_PATH = ['/auth/sign_in/', '/auth/sign_up/', '/auth/refresh/']
 
 JWT_TOKEN = {
     'ACCESS_TOKEN_LIFETIME_MINUTES': 15,

@@ -1,4 +1,4 @@
-from user.services import create_response, get_payload_by_token
+from auth.services import create_response, get_payload_by_token
 from rest_framework import status
 from django.conf import settings
 from user.models import User
@@ -10,6 +10,8 @@ class JWTMiddleware:
         self.next = next
 
     def __call__(self, request):
+        print(request.path)
+        print(settings.NON_TOKEN_PATH)
         access_token = request.COOKIES.get('access_token', None)
 
         if access_token and request.path not in settings.NON_TOKEN_PATH:

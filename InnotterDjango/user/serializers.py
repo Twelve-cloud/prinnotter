@@ -1,8 +1,8 @@
-from django.contrib.auth import authenticate
 from rest_framework import serializers
 from user.models import User
 
 
+<<<<<<< HEAD
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(
         max_length=255,
@@ -58,6 +58,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data, role='u')
 
 
+=======
+>>>>>>> 59f9326 (fix: some fixes)
 class UserSerializer(serializers.ModelSerializer):
     pages = serializers.PrimaryKeyRelatedField(
         many=True,
