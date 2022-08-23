@@ -6,9 +6,8 @@ from auth import views
 router = DefaultRouter()
 
 router.register(
-    prefix='',
+    prefix='auth',
     viewset=views.AuthViewSet,
-    basename='auth'
 )
 
 urlpatterns = router.urls

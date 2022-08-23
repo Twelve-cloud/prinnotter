@@ -10,8 +10,6 @@ class JWTMiddleware:
         self.next = next
 
     def __call__(self, request):
-        print(request.path)
-        print(settings.NON_TOKEN_PATH)
         access_token = request.COOKIES.get('access_token', None)
 
         if access_token and request.path not in settings.NON_TOKEN_PATH:
