@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 
 class TagSerializer(serializers.ModelSerializer):
-    pages = serializers.StringRelatedField(
+    pages = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True
     )
@@ -22,7 +22,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class PageSerializer(serializers.ModelSerializer):
-    posts = serializers.StringRelatedField(
+    posts = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True
     )
