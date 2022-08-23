@@ -28,6 +28,4 @@ def generate_token(*, type, user_id):
         'id': user_id,
         'exp': int(expiry_token_date.strftime('%s'))
     }
-    access_token = jwt.encode(payload, settings.SECRET_KEY, alg='HS256')
-
-    return access_token.decode('utf-8')
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
