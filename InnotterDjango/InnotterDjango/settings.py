@@ -22,6 +22,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
+=======
+    'jwt_auth',
+    'user',
+>>>>>>> 344f632 (fix: some fixes)
     'blog',
     'user',
     'rest_framework'
@@ -35,7 +40,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'auth.middleware.JWTMiddleware'
+    'jwt_auth.middleware.JWTMiddleware'
 ]
 
 ROOT_URLCONF = 'InnotterDjango.urls'
@@ -96,8 +101,6 @@ AUTH_PASSWORD_VALIDATORS = [
             ),
     },
 ]
-
-NON_TOKEN_PATH = ['/auth/sign_in/', '/auth/sign_up/', '/auth/refresh/']
 
 JWT_TOKEN = {
     'ACCESS_TOKEN_LIFETIME_MINUTES': 15,

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from datetime import datetime, timedelta
 from rest_framework import status
 from django.conf import settings
+from user.models import User
 import jwt
 
 
@@ -55,13 +56,42 @@ def set_tokens_to_cookie(response, user_id):
 
 def get_payload_by_token(token):
     """
-    get_payload_by_token: returns payload decoding token
+    get_payload_by_token: returns payload of decoding token.
     """
     return jwt.decode(
         token,
         settings.SECRET_KEY,
         settings.JWT_TOKEN['ALGORITHMS']
     )
+
+
+def get_new_tokens(request, refresh_token):
+    """
+    get_new_refresh_token: returns new refresh token if it's not expired
+    otherwise returns bad request.
+    """
+    try:
+        payload = get_payload_by_token(refresh_token)
+        request.user = User.objects.get(pk=payload.get('id'))
+
+        response = create_response(
+            data={'Tokens': 'OK'},
+            status=status.HTTP_200_OK
+        )
+        set_tokens_to_cookie(response, request.user.id)
+
+        return response
+
+    except jwt.ExpiredSignatureError:
+        return create_response(
+            data={'Refresh Token': 'Expired'},
+            status=status.HTTP_400_BAD_REQUEST,
+            hdrs={'WWW-Authenticate': 'Sign in again'}
+        )
+        # If front-end will get 400_BAD_REQUEST
+        # It will remove refresh token from cookie
+        # and request to /auth/jwt/sign_in
+        # without any tokens in a cookie
 
 
 def create_response(data, status, rndr=None, mtype=None, cntx=None, hdrs=None):
