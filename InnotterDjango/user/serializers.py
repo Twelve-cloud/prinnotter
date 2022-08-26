@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
+        fields = (
             'id',
             'email',
             'username',
@@ -39,8 +39,8 @@ class UserSerializer(serializers.ModelSerializer):
             'follows',
             'requests',
             'liked_posts',
-        ]
-        read_only_fields = [
+        )
+        read_only_fields = (
             'id',
             'image_s3_path',
             'is_blocked',
@@ -48,7 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
             'follows',
             'requests',
             'liked_posts',
-        ]
+        )
 
     def create(self, validated_data):
         if validated_data['role'] == User.Roles.ADMIN:
