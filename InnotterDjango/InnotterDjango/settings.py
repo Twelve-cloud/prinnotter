@@ -1,6 +1,6 @@
-import os
-from pathlib import Path
 from dotenv import load_dotenv
+from pathlib import Path
+import os
 
 
 load_dotenv()
@@ -22,13 +22,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
-=======
     'jwt_auth',
     'user',
->>>>>>> 344f632 (fix: some fixes)
     'blog',
-    'user',
     'rest_framework'
 ]
 

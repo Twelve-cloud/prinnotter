@@ -1,12 +1,12 @@
-from django.shortcuts import render
-from rest_framework import viewsets
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from blog.serializers import TagSerializer, PageSerializer, PostSerializer
-from blog.models import Tag, Page, Post
 from blog.permissions import (
-    IsPageOwner, IsPageNotPrivate, IsPageNotBlocked,
-    IsPageOwnerOrAdmin, IsPageOwnerOrAdminOrModerator, IsAdminOrModerator
+    IsPageNotPrivate, IsPageNotBlocked, IsPageOwner,
+    IsPageOwnerOrAdmin, IsPageOwnerOrAdminOrModerator
 )
+from blog.serializers import TagSerializer, PageSerializer, PostSerializer
+from rest_framework.permissions import IsAuthenticated
+from user.permissions import IsAdminOrModerator
+from blog.models import Tag, Page, Post
+from rest_framework import viewsets
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -55,13 +55,11 @@ class PageViewSet(viewsets.ModelViewSet):
         'update': (
             IsAuthenticated,
             IsPageOwner,
-            IsPageNotPrivate,
             IsPageNotBlocked,
         ),
         'partial_update': (
             IsAuthenticated,
             IsPageOwner,
-            IsPageNotPrivate,
             IsPageNotBlocked,
         ),
         'destroy': (

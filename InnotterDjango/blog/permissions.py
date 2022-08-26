@@ -1,32 +1,31 @@
 from user.permissions import IsAdminOrModerator, IsAdmin
-from django.contrib.auth.models import AnonymousUser
-from blog.models import Page, Post, Tag
 from rest_framework import permissions
+from blog.models import Post
 from user.models import User
 
 
 class IsPageOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if isinstance(obj, Post):
-            obj = obj.page
+            return obj.page.owner == request.user
         return obj.owner == request.user
 
 
 class IsPageNotPrivate(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if isinstance(obj, Post):
-            obj = obj.page
         if IsPageOwnerOrAdminOrModerator.has_object_permission(self, request, view, obj):
             return True
+        if isinstance(obj, Post):
+            return not obj.page.is_private
         return not obj.is_private
 
 
 class IsPageNotBlocked(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if isinstance(obj, Post):
-            obj = obj.page
         if IsAdminOrModerator.has_permission(self, request, view):
             return True
+        if isinstance(obj, Post):
+            return obj.page.unblock_date is None
         return obj.unblock_date is None
 
 
