@@ -16,9 +16,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-DOTENV_PATH = os.path.join(Path(__file__).resolve().parent.parent, '.env')
-
-load_dotenv(DOTENV_PATH)
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,6 +26,8 @@ DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
+AUTH_USER_MODEL = 'user.User'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -35,8 +35,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blog.apps.BlogConfig',
-    'user.apps.UserConfig'
+    'blog',
+    'user',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -83,18 +84,35 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'UserAttributeSimilarityValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'MinimumLengthValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'CommonPasswordValidator'
+        ),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': (
+            'django.contrib.auth.password_validation.'
+            'NumericPasswordValidator'
+            ),
     },
 ]
+
+JWT_TOKEN = {
+    'ACCESS_TOKEN_LIFETIME_MINUTES': 15,
+    'REFRESH_TOKEN_LIFETIME_DAYS': 30
+}
 
 LANGUAGE_CODE = 'en-us'
 
