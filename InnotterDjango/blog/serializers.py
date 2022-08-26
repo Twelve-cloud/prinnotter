@@ -10,15 +10,15 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = [
+        fields = (
             'id',
             'name',
             'pages'
-        ]
-        read_only_fields = [
+        )
+        read_only_fields = (
             'id',
             'pages'
-        ]
+        )
 
 
 class PageSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class PageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = [
+        fields = (
             'id',
             'name',
             'uuid',
@@ -42,20 +42,20 @@ class PageSerializer(serializers.ModelSerializer):
             'follow_requests',
             'unblock_date',
             'posts'
-        ]
-        read_only_fields = [
+        )
+        read_only_fields = (
             'id',
             'followers',
             'follow_requests',
             'unblock_date',
             'posts',
-        ]
+        )
 
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = [
+        fields = (
             'id',
             'page',
             'content',
@@ -63,10 +63,10 @@ class PostSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'liked_posts'
-        ]
-        read_only_fields = [
+        )
+        read_only_fields = (
             'id',
             'created_at',
             'updated_at',
             'liked_posts'
-        ]
+        )
