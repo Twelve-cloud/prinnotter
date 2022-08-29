@@ -29,7 +29,7 @@ def generate_token(*, type, user_id):
 
     expiry_token_date = datetime.now() + lifetime
     payload = {
-        'id': user_id,
+        'sub': user_id,
         'exp': int(expiry_token_date.strftime('%s'))
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
@@ -58,11 +58,15 @@ def get_payload_by_token(token):
     """
     get_payload_by_token: returns payload of decoding token.
     """
-    return jwt.decode(
-        token,
-        settings.SECRET_KEY,
-        settings.JWT_TOKEN['ALGORITHMS']
-    )
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            settings.JWT_TOKEN['ALGORITHMS']
+        )
+        return payload
+    except jwt.ExpiredSignatureError:
+        return None
 
 
 def get_new_tokens(request, refresh_token):
@@ -70,28 +74,28 @@ def get_new_tokens(request, refresh_token):
     get_new_refresh_token: returns new refresh token if it's not expired
     otherwise returns bad request.
     """
-    try:
-        payload = get_payload_by_token(refresh_token)
-        request.user = User.objects.get(pk=payload.get('id'))
+    payload = get_payload_by_token(refresh_token)
 
-        response = create_response(
-            data={'Tokens': 'OK'},
-            status=status.HTTP_200_OK
-        )
-        set_tokens_to_cookie(response, request.user.id)
-
-        return response
-
-    except jwt.ExpiredSignatureError:
+    if payload is None:
         return create_response(
             data={'Refresh Token': 'Expired'},
             status=status.HTTP_400_BAD_REQUEST,
             hdrs={'WWW-Authenticate': 'Sign in again'}
         )
-        # If front-end will get 400_BAD_REQUEST
-        # It will remove refresh token from cookie
-        # and request to /auth/jwt/sign_in
-        # without any tokens in a cookie
+
+    request.user = User.objects.get(pk=payload.get('id'))
+
+    response = create_response(
+        data={'Tokens': 'OK'},
+        status=status.HTTP_200_OK
+    )
+    set_tokens_to_cookie(response, request.user.id)
+
+    return response
+    # If front-end will get 400_BAD_REQUEST
+    # It will remove refresh token from cookie
+    # and request to /auth/jwt/sign_in
+    # without any tokens in a cookie
 
 
 def create_response(data, status, rndr=None, mtype=None, cntx=None, hdrs=None):

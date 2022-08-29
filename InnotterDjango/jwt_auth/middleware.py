@@ -1,3 +1,4 @@
+from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from jwt_auth.services import create_response, get_payload_by_token
 from rest_framework import status
 from user.models import User
@@ -14,20 +15,15 @@ class JWTMiddleware:
         if access_token and request.path != '/auth/jwt/refresh/' and request.path != '/auth/jwt/sign_in/':
             try:
                 payload = get_payload_by_token(access_token)
-                request.user = User.objects.get(pk=payload.get('id'))
+
+                if payload is None:
+                    raise AuthenticationFailed(data={'Error': 'Unauthorized'})
+
+                request.user = User.objects.get(pk=payload.get('sub'))
 
                 if request.user.is_blocked:
-                    return create_response(
-                        data={'Error': 'User is blocked'},
-                        status=status.HTTP_403_FORBIDDEN,
-                    )
+                    raise PermissionDenied(detail={'Error': 'User is blocked'})
 
-            except jwt.ExpiredSignatureError:
-                return create_response(
-                    data={'Error': 'Unauthorized'},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                    hdrs={'WWW-Authenticate': 'Refresh token'}
-                )
                 # If front-end will get HTTP_401_UNAUTHORIZED
                 # It'll delete access token from cookie and
                 # set refresh token to a cookie and request to
