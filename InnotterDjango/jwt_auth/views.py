@@ -1,4 +1,4 @@
-from jwt_auth.services import set_tokens_to_cookie, get_new_tokens
+from jwt_auth.services import set_tokens_to_cookie
 from jwt_auth.serializers import SignInSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
