@@ -1,8 +1,6 @@
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from jwt_auth.services import get_payload_by_token
-from rest_framework import status
 from user.models import User
-import jwt
 
 
 class JWTMiddleware:
