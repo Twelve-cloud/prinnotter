@@ -109,6 +109,12 @@ class PostViewSet(viewsets.ModelViewSet):
         ),
     }
 
+    def list(self, request, *args, **kwargs):
+        self.queryset = Post.objects.filter(
+            page=kwargs.get('parent_lookup_page_id')
+        )
+        return super().list(request, *args, **kwargs)
+
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()

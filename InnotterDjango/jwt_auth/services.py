@@ -15,11 +15,11 @@ def generate_token(*, type, user_id):
     """
     if type == 'access':
         lifetime = timedelta(
-            minutes=1#minutes=settings.JWT_TOKEN['ACCESS_TOKEN_LIFETIME_MINUTES']
+            minutes=settings.JWT_TOKEN['ACCESS_TOKEN_LIFETIME_MINUTES']
         )
     elif type == 'refresh':
         lifetime = timedelta(
-            minutes=2#days=settings.JWT_TOKEN['REFRESH_TOKEN_LIFETIME_DAYS']
+            days=settings.JWT_TOKEN['REFRESH_TOKEN_LIFETIME_DAYS']
         )
     else:
         raise ValueError('Unexpected type of token: must be access or refresh')
