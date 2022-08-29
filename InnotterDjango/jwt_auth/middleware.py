@@ -16,12 +16,12 @@ class JWTMiddleware:
             payload = get_payload_by_token(access_token)
 
             if payload is None:
-                raise AuthenticationFailed(data={'Error': 'Unauthorized'})
+                raise AuthenticationFailed(detail='Unauthorized')
 
             request.user = User.objects.get(pk=payload.get('sub'))
 
             if request.user.is_blocked:
-                raise PermissionDenied(detail={'Error': 'User is blocked'})
+                raise PermissionDenied(detail='User is blocked')
 
                 # If front-end will get HTTP_401_UNAUTHORIZED
                 # It'll delete access token from cookie and
