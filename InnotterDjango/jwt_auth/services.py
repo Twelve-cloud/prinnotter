@@ -1,6 +1,4 @@
-from rest_framework.response import Response
 from datetime import datetime, timedelta
-from rest_framework import status
 from django.conf import settings
 from user.models import User
 import jwt

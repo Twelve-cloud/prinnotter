@@ -1,7 +1,6 @@
 from user.permissions import IsAdminOrModerator, IsAdmin
 from rest_framework import permissions
 from blog.models import Post
-from user.models import User
 
 
 class IsPageOwner(permissions.BasePermission):
