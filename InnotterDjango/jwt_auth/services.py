@@ -1,4 +1,3 @@
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 from rest_framework import status
@@ -77,15 +76,11 @@ def get_new_tokens(request, refresh_token):
     payload = get_payload_by_token(refresh_token)
 
     if payload is None:
-        return create_response(
-            data={'Refresh Token': 'Expired'},
-            status=status.HTTP_400_BAD_REQUEST,
-            hdrs={'WWW-Authenticate': 'Sign in again'}
-        )
+        return None
 
     request.user = User.objects.get(pk=payload.get('id'))
 
-    response = create_response(
+    response = Response(
         data={'Tokens': 'OK'},
         status=status.HTTP_200_OK
     )
@@ -96,19 +91,3 @@ def get_new_tokens(request, refresh_token):
     # It will remove refresh token from cookie
     # and request to /auth/jwt/sign_in
     # without any tokens in a cookie
-
-
-def create_response(data, status, rndr=None, mtype=None, cntx=None, hdrs=None):
-    """
-    create_response: creates and renders response object from rest_framework.
-    """
-    response = Response(data=data, status=status)
-    response.accepted_renderer = rndr if rndr else JSONRenderer()
-    response.accepted_media_type = mtype if mtype else 'application/json'
-    response.renderer_context = cntx if cntx else {}
-
-    for header in (hdrs or []):
-        response.headers[header] = hdrs[header]
-
-    response.render()
-    return response

@@ -1,6 +1,4 @@
-from jwt_auth.services import (
-    create_response, set_tokens_to_cookie, get_new_tokens
-)
+from jwt_auth.services import set_tokens_to_cookie, get_new_tokens
 from jwt_auth.serializers import SignInSerializer
 from rest_framework.decorators import action
 from rest_framework import viewsets
@@ -19,4 +17,12 @@ class AuthViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['get'])
     def refresh(self, request):
         refresh_token = request.COOKIES.get('refresh_token', None)
-        return get_new_tokens(request, refresh_token)
+        new_tokes = get_new_tokens(request, refresh_token)
+
+        if new_tokes is None:
+            return Response(
+                data={'Refresh Token': 'Expired'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return new_tokes
