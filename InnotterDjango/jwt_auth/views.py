@@ -18,12 +18,24 @@ class AuthViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['get'])
     def refresh(self, request):
         refresh_token = request.COOKIES.get('refresh_token', None)
-        new_tokes = get_new_tokens(request, refresh_token)
+        payload = get_payload_by_token(refresh_token)
 
-        if new_tokes is None:
+        if payload is None:
             return Response(
                 data={'Refresh Token': 'Expired'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        return new_tokes
+        request.user = User.objects.get(pk=payload.get('id'))
+
+        response = Response(
+            data={'Tokens': 'OK'},
+            status=status.HTTP_200_OK
+        )
+        set_tokens_to_cookie(response, request.user.id)
+
+        return response
+        # If front-end will get 400_BAD_REQUEST
+        # It will remove refresh token from cookie
+        # and request to /auth/jwt/sign_in
+        # without any tokens in a cookie
