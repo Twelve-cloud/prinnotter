@@ -8,8 +8,8 @@ from user.models import User
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
     queryset = User.objects.all()
+    serializer_class = UserSerializer
     permission_classes = []
     permission_map = {
         'create': (

@@ -10,8 +10,8 @@ from rest_framework import viewsets
 
 
 class TagViewSet(viewsets.ModelViewSet):
-    serializer_class = TagSerializer
     queryset = Tag.objects.all()
+    serializer_class = TagSerializer
     http_method_names = ['get', 'post', 'head', 'delete']
     permission_classes = []
     permission_map = {
@@ -34,11 +34,12 @@ class TagViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
+    
 
 
 class PageViewSet(viewsets.ModelViewSet):
-    serializer_class = PageSerializer
     queryset = Page.objects.all()
+    serializer_class = PageSerializer
     permission_classes = []
     permission_map = {
         'create': (
@@ -74,8 +75,8 @@ class PageViewSet(viewsets.ModelViewSet):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    serializer_class = PostSerializer
     queryset = Post.objects.all()
+    serializer_class = PostSerializer
     permission_classes = []
     permission_map = {
         'create': (
