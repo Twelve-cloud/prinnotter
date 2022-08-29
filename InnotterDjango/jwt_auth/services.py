@@ -66,28 +66,3 @@ def get_payload_by_token(token):
         return payload
     except jwt.ExpiredSignatureError:
         return None
-
-
-def get_new_tokens(request, refresh_token):
-    """
-    get_new_refresh_token: returns new refresh token if it's not expired
-    otherwise returns bad request.
-    """
-    payload = get_payload_by_token(refresh_token)
-
-    if payload is None:
-        return None
-
-    request.user = User.objects.get(pk=payload.get('id'))
-
-    response = Response(
-        data={'Tokens': 'OK'},
-        status=status.HTTP_200_OK
-    )
-    set_tokens_to_cookie(response, request.user.id)
-
-    return response
-    # If front-end will get 400_BAD_REQUEST
-    # It will remove refresh token from cookie
-    # and request to /auth/jwt/sign_in
-    # without any tokens in a cookie
