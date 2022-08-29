@@ -1,5 +1,6 @@
 from jwt_auth.services import set_tokens_to_cookie, get_new_tokens
 from jwt_auth.serializers import SignInSerializer
+from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework import status
@@ -10,7 +11,7 @@ class AuthViewSet(viewsets.GenericViewSet):
     def sign_in(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        response = create_response(serializer.data, status=status.HTTP_200_OK)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
         set_tokens_to_cookie(response, serializer.validated_data['id'])
         return response
 
