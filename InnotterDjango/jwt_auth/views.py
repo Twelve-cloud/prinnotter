@@ -1,9 +1,10 @@
-from jwt_auth.services import set_tokens_to_cookie
+from jwt_auth.services import set_tokens_to_cookie, get_payload_by_token
 from jwt_auth.serializers import SignInSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework import status
+from user.models import User
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -26,7 +27,7 @@ class AuthViewSet(viewsets.GenericViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        request.user = User.objects.get(pk=payload.get('id'))
+        request.user = User.objects.get(pk=payload.get('sub'))
 
         response = Response(
             data={'Tokens': 'OK'},
