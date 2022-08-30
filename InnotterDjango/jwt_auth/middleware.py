@@ -10,7 +10,7 @@ class JWTMiddleware:
     def __call__(self, request):
         access_token = request.COOKIES.get('access_token', None)
 
-        if access_token:
+        if access_token and request.path != '/auth/jwt/sign_in/' and request.path != '/auth/jwt/refresh/' and request.path != '/admin/' and request.path != '/admin/login/':
             payload = get_payload_by_token(access_token)
 
             if payload is None:
