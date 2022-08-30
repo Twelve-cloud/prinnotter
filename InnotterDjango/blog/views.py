@@ -83,10 +83,9 @@ class PageViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
         page = Page.objects.get(pk=pk)
-        serializer = self.serializer_class(page, data={}, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(unblock_date=request.data.get('unblock_date', False))
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        page.unblock_date=request.data.get('unblock_date', False)
+        page.save()
+        return Response("Success", status=status.HTTP_200_OK)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -123,6 +122,11 @@ class PostViewSet(viewsets.ModelViewSet):
             IsPageOwnerOrAdminOrModerator,
             IsPageNotBlocked,
         ),
+        'like': (
+            IsAuthenticated,
+            IsPageNotPrivate,
+            IsPageNotBlocked
+        ),
     }
 
     def list(self, request, *args, **kwargs):
@@ -134,3 +138,12 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
+
+    @action(detail=True, methods=['patch'])
+    def like(self, request, parent_lookup_page_id=None, pk=None):
+        post = Post.objects.get(pk=pk)
+        if request.user in post.liked_posts.all():
+            post.liked_posts.remove(request.user.pk)
+        else:
+            post.liked_posts.add(request.user.pk)
+        return Response("Success", status=status.HTTP_200_OK)
