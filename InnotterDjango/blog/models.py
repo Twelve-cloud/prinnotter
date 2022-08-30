@@ -51,6 +51,8 @@ class Page(models.Model):
 
     followers = models.ManyToManyField(
         'user.User',
+        blank=True,
+        null=True,
         related_name='follows',
         verbose_name='Followers',
     )
@@ -68,6 +70,8 @@ class Page(models.Model):
 
     follow_requests = models.ManyToManyField(
         'user.User',
+        blank=True,
+        null=True,
         related_name='requests',
         verbose_name='Requests',
     )
@@ -106,6 +110,8 @@ class Post(models.Model):
 
     liked_posts = models.ManyToManyField(
         'user.User',
+        blank=True,
+        null=True,
         related_name='liked_posts',
         verbose_name='Liked posts',
     )
@@ -114,6 +120,7 @@ class Post(models.Model):
         'self',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='replies',
         verbose_name='Reply to',
     )
