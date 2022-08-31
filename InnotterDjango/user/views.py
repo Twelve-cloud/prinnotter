@@ -53,10 +53,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
-        user = User.objects.get(pk=pk)
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response('User is not found', status=status.HTTP_404_NOT_FOUND)
+
         user.is_blocked = request.data.get('is_blocked', False)
         user.save()
-        return Response("Success", status=status.HTTP_200_OK)
+
+        return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'], serializer_class=PostSerializer)
     def liked_posts(self, request, pk=None):
