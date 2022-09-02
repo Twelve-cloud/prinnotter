@@ -3,6 +3,11 @@ from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(
+        max_length=1,
+        default=User.Roles.USER,
+    )
+
     pages = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True

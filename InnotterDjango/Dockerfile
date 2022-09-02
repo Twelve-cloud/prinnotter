@@ -13,4 +13,3 @@ RUN poetry install
 COPY . /code
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
-EXPOSE 8000

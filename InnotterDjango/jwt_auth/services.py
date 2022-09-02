@@ -1,6 +1,4 @@
-from rest_framework.response import Response
 from datetime import datetime, timedelta
-from rest_framework import status
 from django.conf import settings
 from user.models import User
 import jwt
@@ -64,5 +62,5 @@ def get_payload_by_token(token):
             settings.JWT_TOKEN['ALGORITHMS']
         )
         return payload
-    except jwt.ExpiredSignatureError:
+    except (jwt.InvalidTokenError, jwt.ExpiredSignature, jwt.DecodeError):
         return None

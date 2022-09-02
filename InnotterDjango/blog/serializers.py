@@ -22,6 +22,10 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class PageSerializer(serializers.ModelSerializer):
+    owner = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
+
     posts = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True

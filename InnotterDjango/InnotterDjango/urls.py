@@ -3,8 +3,8 @@ from django.contrib import admin
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('auth/', include('jwt_auth.urls')),
-    path('user/', include('user.urls')),
-    path('blog/', include('blog.urls')),
+    path('api/v1/admin/', admin.site.urls),
+    path('api/v1/auth/', include('jwt_auth.urls')),
+    path('api/v1/user/', include('user.urls')),
+    path('api/v1/blog/', include('blog.urls')),
 ]
