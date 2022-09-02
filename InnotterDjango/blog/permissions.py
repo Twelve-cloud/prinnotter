@@ -38,3 +38,13 @@ class IsPageOwnerOrAdminOrModerator(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return IsPageOwner.has_object_permission(self, request, view, obj) or \
             IsAdminOrModerator.has_permission(self, request, view)
+
+
+class IsNotPageOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return not IsPageOwner(self, request, view, obj)
+
+
+class IsPagePrivate(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.is_private

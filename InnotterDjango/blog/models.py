@@ -109,7 +109,7 @@ class Post(models.Model):
         verbose_name='Content',
     )
 
-    liked_posts = models.ManyToManyField(
+    users_liked = models.ManyToManyField(
         'user.User',
         blank=True,
         null=True,

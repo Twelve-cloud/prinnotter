@@ -2,6 +2,7 @@ from user.permissions import (
     IsNotAuthentificatedOrAdmin, IsUserOwnerOrAdmin, IsAdmin, IsUserOwner
 )
 from rest_framework.permissions import IsAuthenticated
+from user.services import get_user_by_id, set_blocking
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from user.serializers import UserSerializer
@@ -53,18 +54,19 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
-        try:
-            user = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            return Response('User is not found', status=status.HTTP_404_NOT_FOUND)
+        user = get_user_by_id(pk)
 
-        user.is_blocked = request.data.get('is_blocked', False)
-        user.save()
+        if not user:
+            return Response(
+                'User is not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
 
+        set_blocking(user, request.data.get('is_blocked', False))
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'], serializer_class=PostSerializer)
     def liked_posts(self, request, pk=None):
-        posts = request.user.liked_posts
-        serializer = self.serializer_class(posts, many=True)
+        liked_posts = request.user.liked_posts
+        serializer = self.serializer_class(liked_posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
