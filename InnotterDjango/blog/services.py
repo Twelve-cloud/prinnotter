@@ -36,7 +36,7 @@ def follow_page(page, user):
 
 
 def like_post(post, user):
-    if user in post.liked_posts.all():
-        post.liked_posts.remove(user.pk)
+    if user in post.users_liked.all():
+        post.users_liked.remove(user.pk)
     else:
-        post.liked_posts.add(user.pk)
+        post.users_liked.add(user.pk)

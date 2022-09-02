@@ -1,10 +1,14 @@
 from blog.permissions import (
     IsPageNotPrivate, IsPageNotBlocked, IsPageOwner,
     IsPageOwnerOrAdmin, IsPageOwnerOrAdminOrModerator,
-    IsNotPageOwner
+    IsNotPageOwner, IsPagePrivate
+)
+from blog.services import (
+    get_page_by_id, get_post_by_id,
+    set_blocking, follow_page,
+    like_post
 )
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
-from blog.services import get_page_by_id, get_post_by_id, set_blocking
 from rest_framework.permissions import IsAuthenticated
 from user.permissions import IsAdminOrModerator
 from rest_framework.decorators import action
@@ -125,7 +129,7 @@ class PageViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        set_blocking(page, request.data.get('unblock_date', False))
+        set_blocking(page, request.data.get('unblock_date', None))
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
@@ -157,50 +161,6 @@ class PageViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
-    def accept_all(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        self.check_object_permissions(request, page)
-
-        if not page.is_private:
-            return Response(
-                'Page is not private',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # logic
-
-        return Response('Success', status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['patch'])
-    def decline_all(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        self.check_object_permissions(request, page)
-
-        if not page.is_private:
-            return Response(
-                'Page is not private',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # logic
-
-        return Response('Success', status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['patch'])
     def accept(self, request, pk=None):
         page = get_page_by_id(pk)
 
@@ -224,6 +184,52 @@ class PageViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def decline(self, request, pk=None):
+        page = get_page_by_id(pk)
+
+        if not page:
+            return Response(
+                'Page is not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        self.check_object_permissions(request, page)
+
+        if not page.is_private:
+            return Response(
+                'Page is not private',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # logic
+
+        return Response('Success', status=status.HTTP_200_OK)
+
+
+
+    @action(detail=True, methods=['patch'])
+    def accept_all(self, request, pk=None):
+        page = get_page_by_id(pk)
+
+        if not page:
+            return Response(
+                'Page is not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        self.check_object_permissions(request, page)
+
+        if not page.is_private:
+            return Response(
+                'Page is not private',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # logic
+
+        return Response('Success', status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['patch'])
+    def decline_all(self, request, pk=None):
         page = get_page_by_id(pk)
 
         if not page:
@@ -294,8 +300,29 @@ class PostViewSet(viewsets.ModelViewSet):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
 
+    def list(self, request, *args, **kwargs):
+        parent_page_id = self.kwargs.get('parent_lookup_page_id')
+        page = get_page_by_id(parent_page_id)
+
+        if not page:
+            return Response(
+                'Page is not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        self.check_object_permissions(request, page)
+        return super().list(request, args, kwargs)
+
     @action(detail=True, methods=['patch'])
     def like(self, request, parent_lookup_page_id=None, pk=None):
+        page = get_page_by_id(parent_lookup_page_id)
+
+        if not page:
+            return Response(
+                'Page is not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         post = get_post_by_id(pk)
 
         if not post:
