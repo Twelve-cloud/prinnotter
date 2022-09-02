@@ -1,3 +1,4 @@
+from blog.managers import PostManager
 from django.db import models
 
 
@@ -127,6 +128,8 @@ class Post(models.Model):
         auto_now=True,
         verbose_name='Updated at',
     )
+
+    objects = PostManager()
 
     class Meta:
         verbose_name = 'Post'

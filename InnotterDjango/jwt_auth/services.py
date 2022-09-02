@@ -62,5 +62,5 @@ def get_payload_by_token(token):
             settings.JWT_TOKEN['ALGORITHMS']
         )
         return payload
-    except jwt.ExpiredSignatureError:
+    except (jwt.InvalidTokenError, jwt.ExpiredSignature, jwt.DecodeError):
         return None

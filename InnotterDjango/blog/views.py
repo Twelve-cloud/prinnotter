@@ -5,14 +5,17 @@ from blog.permissions import (
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
 from user.permissions import IsAdminOrModerator
+from rest_framework import viewsets, mixins
 from blog.models import Tag, Page, Post
-from rest_framework import viewsets
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.DestroyModelMixin,
+                 mixins.ListModelMixin,
+                 viewsets.GenericViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    http_method_names = ['get', 'post', 'head', 'delete']
     permission_classes = []
     permission_map = {
         'create': (
@@ -34,7 +37,6 @@ class TagViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
-    
 
 
 class PageViewSet(viewsets.ModelViewSet):
@@ -110,11 +112,9 @@ class PostViewSet(viewsets.ModelViewSet):
         ),
     }
 
-    def list(self, request, *args, **kwargs):
-        self.queryset = Post.objects.filter(
-            page=kwargs.get('parent_lookup_page_id')
-        )
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        parent_page_id = self.kwargs.get('parent_lookup_page_id')
+        return Post.objects.get_posts_of_page(parent_page_id)
 
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
