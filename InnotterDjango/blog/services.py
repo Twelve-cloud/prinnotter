@@ -1,4 +1,6 @@
+from user.services import get_user_by_id
 from blog.models import Page, Post
+from user.models import User
 
 
 def get_page_by_id(page_id):
@@ -40,3 +42,38 @@ def like_post(post, user):
         post.users_liked.remove(user.pk)
     else:
         post.users_liked.add(user.pk)
+
+
+def add_user_to_followers(page, user_id):
+    try:
+        user = get_user_by_id(user_id)
+        if user in page.follow_requests.all():
+            page.follow_requests.remove(user.pk)
+            page.followers.add(user.pk)
+            return True
+        else:
+            return False
+    except User.DoesNotExist:
+        return False
+
+
+def add_all_users_to_followers(page):
+    for user in page.follow_requests.all():
+        add_user_to_followers(page, user.pk)
+
+
+def remove_user_from_requests(page, user_id):
+    try:
+        user = get_user_by_id(user_id)
+        if user in page.follow_requests.all():
+            page.follow_requests.remove(user.pk)
+            return True
+        else:
+            return False
+    except User.DoesNotExist:
+        return False
+
+
+def remove_all_users_from_requests(page):
+    for user in page.follow_requests.all():
+        remove_user_from_requests(page, user.pk)

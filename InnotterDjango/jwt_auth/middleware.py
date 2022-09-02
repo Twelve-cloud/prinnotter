@@ -11,7 +11,7 @@ class JWTMiddleware:
     def __call__(self, request):
         access_token = request.COOKIES.get('access_token', None)
 
-        if access_token and request.path != '/api/v1/auth/jwt/sign_in/' and request.path != '/api/v1/auth/jwt/refresh/' and request.path != '/api/v1/admin/' and request.path != '/api/v1/admin/login/':
+        if access_token:
             payload = get_payload_by_token(access_token)
 
             if payload is None:

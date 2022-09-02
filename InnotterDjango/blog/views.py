@@ -4,9 +4,9 @@ from blog.permissions import (
     IsNotPageOwner, IsPagePrivate
 )
 from blog.services import (
-    get_page_by_id, get_post_by_id,
-    set_blocking, follow_page,
-    like_post
+    get_page_by_id, get_post_by_id, set_blocking, follow_page,
+    like_post, add_user_to_followers, add_all_users_to_followers,
+    remove_user_from_requests, remove_all_users_from_requests
 )
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -93,26 +93,30 @@ class PageViewSet(viewsets.ModelViewSet):
             IsPageNotBlocked,
             IsPagePrivate
         ),
-        'accept_all': (
-            IsAuthenticated,
-            IsPageOwner,
-            IsPageNotBlocked
-        ),
-        'decline_all': (
-            IsAuthenticated,
-            IsPageOwner,
-            IsPageNotBlocked
-        ),
         'accept': (
             IsAuthenticated,
             IsPageOwner,
-            IsPageNotBlocked
+            IsPageNotBlocked,
+            IsPagePrivate
+        ),
+        'accept_all': (
+            IsAuthenticated,
+            IsPageOwner,
+            IsPageNotBlocked,
+            IsPagePrivate
         ),
         'decline': (
             IsAuthenticated,
             IsPageOwner,
-            IsPageNotBlocked
-        )
+            IsPageNotBlocked,
+            IsPagePrivate
+        ),
+        'decline_all': (
+            IsAuthenticated,
+            IsPageOwner,
+            IsPageNotBlocked,
+            IsPagePrivate
+        ),
     }
 
     def get_permissions(self):
@@ -172,14 +176,26 @@ class PageViewSet(viewsets.ModelViewSet):
 
         self.check_object_permissions(request, page)
 
-        if not page.is_private:
+        if not add_user_to_followers(page, request.data.get('user_id', None)):
             return Response(
-                'Page is not private',
+                'User is not found',
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # logic
+        return Response('Success', status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['patch'])
+    def accept_all(self, request, pk=None):
+        page = get_page_by_id(pk)
+
+        if not page:
+            return Response(
+                'Page is not found',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        self.check_object_permissions(request, page)
+        add_all_users_to_followers(page)
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
@@ -194,37 +210,11 @@ class PageViewSet(viewsets.ModelViewSet):
 
         self.check_object_permissions(request, page)
 
-        if not page.is_private:
+        if not remove_user_from_requests(page, request.data.get('user_id', None)):
             return Response(
-                'Page is not private',
+                'User is not found',
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # logic
-
-        return Response('Success', status=status.HTTP_200_OK)
-
-
-
-    @action(detail=True, methods=['patch'])
-    def accept_all(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        self.check_object_permissions(request, page)
-
-        if not page.is_private:
-            return Response(
-                'Page is not private',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # logic
 
         return Response('Success', status=status.HTTP_200_OK)
 
@@ -239,15 +229,7 @@ class PageViewSet(viewsets.ModelViewSet):
             )
 
         self.check_object_permissions(request, page)
-
-        if not page.is_private:
-            return Response(
-                'Page is not private',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # logic
-
+        remove_all_users_from_requests(page)
         return Response('Success', status=status.HTTP_200_OK)
 
 
