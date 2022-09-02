@@ -7,15 +7,18 @@ from rest_framework.permissions import IsAuthenticated
 from user.permissions import IsAdminOrModerator
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import viewsets, mixins
 from blog.models import Tag, Page, Post
-from rest_framework import viewsets
 from rest_framework import status
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(mixins.CreateModelMixin,
+                 mixins.RetrieveModelMixin,
+                 mixins.DestroyModelMixin,
+                 mixins.ListModelMixin,
+                 viewsets.GenericViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    http_method_names = ['get', 'post', 'head', 'delete']
     permission_classes = []
     permission_map = {
         'create': (
@@ -37,7 +40,6 @@ class TagViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
-
 
 
 class PageViewSet(viewsets.ModelViewSet):
@@ -116,11 +118,10 @@ class PageViewSet(viewsets.ModelViewSet):
         except Page.DoesNotExist:
             return Response('Page is not found', status=status.HTTP_404_NOT_FOUND)
 
-        page.unblock_date=request.data.get('unblock_date', False)
+        page.unblock_date = request.data.get('unblock_date', False)
         page.save()
 
         return Response('Success', status=status.HTTP_200_OK)
-
 
     @action(detail=True, methods=['patch'])
     def follow(self, request, pk=None):
@@ -269,13 +270,9 @@ class PostViewSet(viewsets.ModelViewSet):
         ),
     }
 
-    def list(self, request, *args, **kwargs):
-        page = Page.objects.get(pk=kwargs.get('parent_lookup_page_id'))
-        self.check_object_permissions(request, page)
-        self.queryset = Post.objects.filter(
-            page=kwargs.get('parent_lookup_page_id')
-        )
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        parent_page_id = self.kwargs.get('parent_lookup_page_id')
+        return Post.objects.get_posts_of_page(parent_page_id)
 
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
