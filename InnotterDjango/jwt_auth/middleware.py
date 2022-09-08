@@ -1,6 +1,6 @@
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from jwt_auth.services import get_payload_by_token
-from user.services import get_user_by_id
+from django.shortcuts import get_object_or_404
 from user.models import User
 
 
@@ -17,10 +17,7 @@ class JWTMiddleware:
             if payload is None:
                 raise AuthenticationFailed(detail='Unauthorized')
 
-            request.user = get_user_by_id(payload.get('sub'))
-
-            if not request.user:
-                raise AuthenticationFailed(detail='Unauthorized')
+            request.user = get_object_or_404(User, pk=payload.get('sub'))
 
             if request.user.is_blocked:
                 raise PermissionDenied(detail='User is blocked')

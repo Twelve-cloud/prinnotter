@@ -4,13 +4,14 @@ from blog.permissions import (
     IsNotPageOwner, IsPagePrivate
 )
 from blog.services import (
-    get_page_by_id, get_post_by_id, set_blocking, follow_page,
-    like_post, add_user_to_followers, add_all_users_to_followers,
+    set_blocking, follow_page, like_or_unlike_post,
+    add_user_to_followers, add_all_users_to_followers,
     remove_user_from_requests, remove_all_users_from_requests
 )
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
 from user.permissions import IsAdminOrModerator
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins
@@ -125,109 +126,48 @@ class PageViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=pk)
         set_blocking(page, request.data.get('unblock_date', None))
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
     def follow(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=pk)
         self.check_object_permissions(request, page)
         follow_page(page, request.user)
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def requests(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=pk)
         self.check_object_permissions(request, page)
         serializer = self.serializer_class(page)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
     def accept(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=pk)
         self.check_object_permissions(request, page)
-
-        if not add_user_to_followers(page, request.data.get('user_id', None)):
-            return Response(
-                'User is not found',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+        add_user_to_followers(page, request.data.get('user_id', None))
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
     def accept_all(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=pk)
         self.check_object_permissions(request, page)
         add_all_users_to_followers(page)
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
     def decline(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=pk)
         self.check_object_permissions(request, page)
-
-        if not remove_user_from_requests(page, request.data.get('user_id', None)):
-            return Response(
-                'User is not found',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+        remove_user_from_requests(page, request.data.get('user_id', None))
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
     def decline_all(self, request, pk=None):
-        page = get_page_by_id(pk)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=pk)
         self.check_object_permissions(request, page)
         remove_all_users_from_requests(page)
         return Response('Success', status=status.HTTP_200_OK)
@@ -284,35 +224,14 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         parent_page_id = self.kwargs.get('parent_lookup_page_id')
-        page = get_page_by_id(parent_page_id)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+        page = get_object_or_404(Page, pk=parent_page_id)
         self.check_object_permissions(request, page)
         return super().list(request, args, kwargs)
 
     @action(detail=True, methods=['patch'])
     def like(self, request, parent_lookup_page_id=None, pk=None):
-        page = get_page_by_id(parent_lookup_page_id)
-
-        if not page:
-            return Response(
-                'Page is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        post = get_post_by_id(pk)
-
-        if not post:
-            return Response(
-                'Post is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        self.check_object_permissions(request, post)
-        like_post(post, request.user)
+        page = get_object_or_404(Page, pk=parent_page_id)
+        post = get_object_or_404(Post, pk=pk)
+        self.check_object_permissions(request, page)
+        like_or_unlike_post(post, request.user)
         return Response('Success', status=status.HTTP_200_OK)

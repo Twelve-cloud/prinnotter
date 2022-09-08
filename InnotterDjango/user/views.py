@@ -2,11 +2,12 @@ from user.permissions import (
     IsNotAuthentificatedOrAdmin, IsUserOwnerOrAdmin, IsAdmin, IsUserOwner
 )
 from rest_framework.permissions import IsAuthenticated
-from user.services import get_user_by_id, set_blocking
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from user.serializers import UserSerializer
 from blog.serializers import PostSerializer
+from user.services import set_blocking
 from rest_framework import viewsets
 from rest_framework import status
 from user.models import User
@@ -54,7 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
-        user = get_user_by_id(pk)
+        user = get_object_or_404(User, pk=pk)
 
         if not user:
             return Response(
@@ -67,7 +68,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], serializer_class=PostSerializer)
     def liked_posts(self, request, pk=None):
-        user = get_user_by_id(pk)
+        user = get_object_or_404(User, pk=pk)
 
         if not user:
             return Response(

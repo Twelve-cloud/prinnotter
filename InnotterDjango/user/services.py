@@ -1,14 +1,10 @@
 from user.models import User
 
 
-def get_user_by_id(user_id):
-    try:
-        user = User.objects.get(pk=user_id)
-        return user
-    except User.DoesNotExist:
-        return None
-
-
-def set_blocking(user, is_blocked):
+def set_blocking(user: User, is_blocked: bool) -> None:
+    """
+    set_blocking: set is_blocked parameter to is_blocked field of user.
+    if is_blocked == False, user's not blocked, otherwise user's blocked.
+    """
     user.is_blocked = is_blocked
     user.save()
