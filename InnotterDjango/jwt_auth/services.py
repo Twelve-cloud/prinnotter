@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from datetime import datetime, timedelta
 from django.conf import settings
 from user.models import User
-from typing import Union
+from typing import Optional
 import jwt
 
 
@@ -53,7 +53,7 @@ def set_tokens_to_cookie(response: Response, user_id: int) -> None:
     )
 
 
-def get_payload_by_token(token: str) -> Union[dict, None]:
+def get_payload_by_token(token: str) -> Optional[dict]:
     """
     get_payload_by_token: returns payload of decoding token.
     """
