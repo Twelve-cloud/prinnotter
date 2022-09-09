@@ -56,26 +56,12 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
         user = get_object_or_404(User, pk=pk)
-
-        if not user:
-            return Response(
-                'User is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
         set_blocking(user, request.data.get('is_blocked', False))
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'], serializer_class=PostSerializer)
     def liked_posts(self, request, pk=None):
         user = get_object_or_404(User, pk=pk)
-
-        if not user:
-            return Response(
-                'User is not found',
-                status=status.HTTP_404_NOT_FOUND
-            )
-
         self.check_object_permissions(request, user)
         liked_posts = user.liked_posts
         serializer = self.serializer_class(liked_posts, many=True)
