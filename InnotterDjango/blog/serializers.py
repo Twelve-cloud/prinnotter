@@ -66,11 +66,11 @@ class PostSerializer(serializers.ModelSerializer):
             'reply_to',
             'created_at',
             'updated_at',
-            'liked_posts'
+            'users_liked'
         )
         read_only_fields = (
             'id',
             'created_at',
             'updated_at',
-            'liked_posts'
+            'users_liked'
         )

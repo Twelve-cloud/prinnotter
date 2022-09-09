@@ -1,7 +1,7 @@
 from jwt_auth.services import set_tokens_to_cookie, get_payload_by_token
 from jwt_auth.serializers import SignInSerializer
-from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import status
 from user.models import User

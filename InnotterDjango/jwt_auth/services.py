@@ -1,10 +1,12 @@
+from rest_framework.response import Response
 from datetime import datetime, timedelta
 from django.conf import settings
 from user.models import User
+from typing import Optional
 import jwt
 
 
-def generate_token(*, type, user_id):
+def generate_token(*, type: str, user_id: int) -> str:
     """
     generate_token: generates corresponding token for user.
     Parameters:
@@ -32,7 +34,7 @@ def generate_token(*, type, user_id):
     return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
 
-def set_tokens_to_cookie(response, user_id):
+def set_tokens_to_cookie(response: Response, user_id: int) -> None:
     """
     set_token_to_cookie: set token to cookie to response object.
     """
@@ -51,7 +53,7 @@ def set_tokens_to_cookie(response, user_id):
     )
 
 
-def get_payload_by_token(token):
+def get_payload_by_token(token: str) -> Optional[dict]:
     """
     get_payload_by_token: returns payload of decoding token.
     """
@@ -62,5 +64,5 @@ def get_payload_by_token(token):
             settings.JWT_TOKEN['ALGORITHMS']
         )
         return payload
-    except (jwt.InvalidTokenError, jwt.ExpiredSignature, jwt.DecodeError):
+    except (jwt.InvalidTokenError, jwt.ExpiredSignatureError, jwt.DecodeError):
         return None
