@@ -17,10 +17,8 @@ class TestPermissions:
 
         request.user = created_user
         assert IsAdmin.has_permission(..., request, ...) is False
-
         request.user.role = 'm'
         assert IsAdmin.has_permission(..., request, ...) is False
-
         request.user.role = 'a'
         assert IsAdmin.has_permission(..., request, ...) is True
 
@@ -29,10 +27,8 @@ class TestPermissions:
 
         request.user = created_user
         assert IsModerator.has_permission(..., request, ...) is False
-
         request.user.role = 'a'
         assert IsModerator.has_permission(..., request, ...) is False
-
         request.user.role = 'm'
         assert IsModerator.has_permission(..., request, ...) is True
 
@@ -41,10 +37,8 @@ class TestPermissions:
 
         request.user = created_user
         assert IsAdminOrModerator.has_permission(..., request, ...) is False
-
         request.user.role = 'a'
         assert IsAdminOrModerator.has_permission(..., request, ...) is True
-
         request.user.role = 'm'
         assert IsAdminOrModerator.has_permission(..., request, ...) is True
 
@@ -55,10 +49,8 @@ class TestPermissions:
 
         obj = AnonymousUser()
         assert IsUserOwner.has_object_permission(..., request, ..., obj) is False
-
         obj = baker.make(User, role='m')
         assert IsUserOwner.has_object_permission(..., request, ..., obj) is False
-
         obj = created_user
         assert IsUserOwner.has_object_permission(..., request, ..., obj) is True
 
@@ -69,10 +61,8 @@ class TestPermissions:
 
         obj = AnonymousUser()
         assert IsUserOwnerOrAdmin.has_object_permission(..., request, ..., obj) is False
-
         obj = created_user
         assert IsUserOwnerOrAdmin.has_object_permission(..., request, ..., obj) is True
-
         request.user = baker.make(User, role='a')
         assert IsUserOwnerOrAdmin.has_object_permission(..., request, ..., obj) is True
 
@@ -81,12 +71,9 @@ class TestPermissions:
 
         request.user = created_user
         assert IsNotAuthentificatedOrAdmin.has_permission(..., request, ...) is False
-
         request.user.role = 'm'
         assert IsNotAuthentificatedOrAdmin.has_permission(..., request, ...) is False
-
         request.user.role = 'a'
         assert IsNotAuthentificatedOrAdmin.has_permission(..., request, ...) is True
-
         request.user = AnonymousUser()
         assert IsNotAuthentificatedOrAdmin.has_permission(..., request, ...) is True

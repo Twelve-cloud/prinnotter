@@ -61,13 +61,15 @@ WSGI_APPLICATION = 'InnotterDjango.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE'))
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'innotter_db',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': os.getenv('POSTGRES_DB'),
+        # 'HOST': os.getenv('POSTGRES_HOST'),
+        # 'PORT': os.getenv('POSTGRES_PORT'),
+        # 'USER': os.getenv('POSTGRES_USER'),
+        # 'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        # 'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE'))
     }
 }
 
