@@ -72,3 +72,10 @@ def update_json():
         'first_name': 'James',
         'last_name': 'Bond'
     }
+
+
+@pytest.fixture()
+def block_json():
+    return {
+        'is_blocked': 'True'
+    }
