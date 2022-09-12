@@ -1,6 +1,5 @@
 from user.serializers import UserSerializer
 from django.db.utils import IntegrityError
-from user.models import User
 import pytest
 
 
