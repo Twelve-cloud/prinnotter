@@ -1,6 +1,6 @@
-import pytest
-from user.models import User
 from model_bakery import baker
+from user.models import User
+import pytest
 
 
 @pytest.fixture()

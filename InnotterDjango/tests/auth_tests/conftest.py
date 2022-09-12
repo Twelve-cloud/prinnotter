@@ -1,4 +1,6 @@
 from jwt_auth.services import generate_token
+from model_bakery import baker
+from user.models import User
 import pytest
 
 
@@ -14,3 +16,25 @@ def refresh_data():
     user_id = 100
     refresh_token = generate_token(type='refresh', user_id=user_id)
     return refresh_token, user_id
+
+
+@pytest.fixture()
+def blocked_user():
+    user = baker.prepare(User, role='u', is_blocked=True)
+    user.set_password('12341234')
+    user.save()
+    return {
+        'email': user.email,
+        'password': '12341234'
+    }
+
+
+@pytest.fixture()
+def non_blocked_user():
+    user = baker.prepare(User, role='u')
+    user.set_password('12341234')
+    user.save()
+    return {
+        'email': user.email,
+        'password': '12341234'
+    }
