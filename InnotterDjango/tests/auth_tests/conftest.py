@@ -19,7 +19,7 @@ def refresh_data():
 
 
 @pytest.fixture()
-def blocked_user():
+def blocked_user_json():
     user = baker.prepare(User, role='u', is_blocked=True)
     user.set_password('12341234')
     user.save()
@@ -30,7 +30,7 @@ def blocked_user():
 
 
 @pytest.fixture()
-def non_blocked_user():
+def user_json():
     user = baker.prepare(User, role='u')
     user.set_password('12341234')
     user.save()
@@ -38,3 +38,8 @@ def non_blocked_user():
         'email': user.email,
         'password': '12341234'
     }
+
+
+@pytest.fixture()
+def created_user():
+    return baker.make(User, role='u')
