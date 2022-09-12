@@ -6,7 +6,6 @@ import pytest
 
 pytestmark = pytest.mark.django_db
 
-
 block_view = UserViewSet.as_view({'patch': 'block'})
 liked_posts_view = UserViewSet.as_view({'get': 'liked_posts'})
 
