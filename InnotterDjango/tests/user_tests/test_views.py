@@ -1,3 +1,4 @@
+from rest_framework.permissions import IsAuthenticated
 from user.views import UserViewSet
 from rest_framework import status
 from user.models import User
@@ -32,3 +33,8 @@ class TestUserViewSet:
         response = liked_posts_view(request, pk=user.pk)
 
         assert response.status_code == status.HTTP_200_OK
+
+    def test_get_permissions(self, mocker):
+        self = UserViewSet()
+        self.action = 'list'
+        self.get_permissions() is IsAuthenticated
