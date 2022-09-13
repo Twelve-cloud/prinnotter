@@ -4,17 +4,17 @@ import pytest
 
 
 @pytest.fixture()
-def created_user():
+def user():
     return baker.make(User, role='u')
 
 
 @pytest.fixture()
-def created_moderator():
+def moderator():
     return baker.make(User, role='m')
 
 
 @pytest.fixture()
-def created_admin():
+def admin():
     return baker.make(User, role='a')
 
 
@@ -53,3 +53,8 @@ def block_json():
     return {
         'is_blocked': 'True'
     }
+
+
+@pytest.fixture()
+def request_(mocker):
+    return mocker.MagicMock()
