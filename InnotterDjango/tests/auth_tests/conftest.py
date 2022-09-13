@@ -48,3 +48,14 @@ def user():
 @pytest.fixture()
 def refresh_token(user):
     return generate_token(type='refresh', user_id=user.id)
+
+
+@pytest.fixture()
+def access_token(user):
+    return generate_token(type='access', user_id=user.id)
+
+
+@pytest.fixture()
+def access_token_of_blocked_user():
+    user = baker.make(User, role='u', is_blocked=True)
+    return generate_token(type='access', user_id=user.id)

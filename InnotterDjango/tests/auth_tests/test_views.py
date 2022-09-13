@@ -1,5 +1,4 @@
 from jwt_auth.serializers import SignInSerializer
-from jwt_auth.services import generate_token
 from jwt_auth.views import AuthViewSet
 from rest_framework import status
 import pytest
