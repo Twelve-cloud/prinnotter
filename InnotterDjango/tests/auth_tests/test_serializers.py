@@ -1,5 +1,5 @@
-from jwt_auth.serializers import SignInSerializer
 from rest_framework.serializers import ValidationError
+from jwt_auth.serializers import SignInSerializer
 import pytest
 
 

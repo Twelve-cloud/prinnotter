@@ -7,7 +7,7 @@ import pytest
 @pytest.fixture()
 def access_data():
     user_id = 99
-    access_token = generate_token(type='access', user_id=99)
+    access_token = generate_token(type='access', user_id=user_id)
     return access_token, user_id
 
 
@@ -41,5 +41,10 @@ def user_json():
 
 
 @pytest.fixture()
-def created_user():
+def user():
     return baker.make(User, role='u')
+
+
+@pytest.fixture()
+def refresh_token(user):
+    return generate_token(type='refresh', user_id=user.id)

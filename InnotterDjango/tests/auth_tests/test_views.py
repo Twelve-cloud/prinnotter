@@ -7,7 +7,6 @@ import pytest
 
 pytestmark = pytest.mark.django_db
 
-
 sign_in_view = AuthViewSet.as_view({'post': 'sign_in'})
 refresh_view = AuthViewSet.as_view({'get': 'refresh'})
 
@@ -18,19 +17,13 @@ class TestAuthViews:
 
         request = api_factory.post('', user_json, format='json')
         response = sign_in_view(request)
-
         assert response.status_code == status.HTTP_200_OK
 
-    def test_refresh(self, api_factory, created_user):
-        refresh_token = generate_token(type='refresh', user_id=created_user.pk)
-
+    def test_refresh(self, api_factory, refresh_token):
         request = api_factory.get('')
+        response = refresh_view(request)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
         request.COOKIES = {'refresh_token': refresh_token}
         response = refresh_view(request)
-
         assert response.status_code == status.HTTP_200_OK
-
-        request = api_factory.get('')
-        response = refresh_view(request)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
