@@ -33,3 +33,8 @@ def moder():
 @pytest.fixture()
 def admin():
     return baker.make(User, role='a')
+
+
+@pytest.fixture()
+def users():
+    return [baker.make(User, role='u') for i in range(10)]
