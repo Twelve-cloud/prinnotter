@@ -41,11 +41,6 @@ def user_json():
 
 
 @pytest.fixture()
-def user():
-    return baker.make(User, role='u')
-
-
-@pytest.fixture()
 def refresh_token(user):
     return generate_token(type='refresh', user_id=user.id)
 

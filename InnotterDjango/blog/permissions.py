@@ -10,6 +10,30 @@ class IsPageOwner(permissions.BasePermission):
         return obj.owner == request.user
 
 
+class IsNotPageOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return not IsPageOwner.has_object_permission(self, request, view, obj)
+
+
+class IsPageOwnerOrAdmin(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return IsPageOwner.has_object_permission(self, request, view, obj) or \
+            IsAdmin.has_permission(self, request, view)
+
+
+class IsPageOwnerOrAdminOrModerator(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return IsPageOwner.has_object_permission(self, request, view, obj) or \
+            IsAdminOrModerator.has_permission(self, request, view)
+
+
+class IsPagePrivate(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if isinstance(obj, Post):
+            return obj.page.is_private
+        return obj.is_private
+
+
 class IsPageNotPrivate(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if IsPageOwnerOrAdminOrModerator.has_object_permission(self, request, view, obj):
@@ -26,25 +50,3 @@ class IsPageNotBlocked(permissions.BasePermission):
         if isinstance(obj, Post):
             return obj.page.unblock_date is None
         return obj.unblock_date is None
-
-
-class IsPageOwnerOrAdmin(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return IsPageOwner.has_object_permission(self, request, view, obj) or \
-            IsAdmin.has_permission(self, request, view)
-
-
-class IsPageOwnerOrAdminOrModerator(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return IsPageOwner.has_object_permission(self, request, view, obj) or \
-            IsAdminOrModerator.has_permission(self, request, view)
-
-
-class IsNotPageOwner(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return not IsPageOwner.has_object_permission(self, request, view, obj)
-
-
-class IsPagePrivate(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.is_private

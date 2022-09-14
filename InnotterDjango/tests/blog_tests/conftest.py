@@ -1,12 +1,6 @@
 from blog.models import Tag, Page, Post
 from model_bakery import baker
-from user.models import User
 import pytest
-
-
-@pytest.fixture()
-def user():
-    return baker.make(User, role='u')
 
 
 @pytest.fixture()

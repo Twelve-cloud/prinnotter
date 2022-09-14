@@ -1,4 +1,3 @@
-from user.models import User
 import pytest
 
 
