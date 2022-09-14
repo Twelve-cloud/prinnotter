@@ -52,6 +52,7 @@ class TestUserPermissions:
     @pytest.mark.parametrize('obj', ['user', 'moder', 'admin'])
     def test_is_user_owner(self, request, _request, obj, anon):
         obj = request.getfixturevalue(obj)
+
         _request.user = obj
         assert IsUserOwner.has_object_permission(..., _request, ..., obj) is True
         _request.user = anon
@@ -60,6 +61,7 @@ class TestUserPermissions:
     @pytest.mark.parametrize('obj', ['user', 'moder', 'admin'])
     def test_is_user_owner_or_admin(self, request, _request, obj, anon, admin):
         obj = request.getfixturevalue(obj)
+
         _request.user = obj
         assert IsUserOwnerOrAdmin.has_object_permission(..., _request, ..., obj) is True
         _request.user = anon
