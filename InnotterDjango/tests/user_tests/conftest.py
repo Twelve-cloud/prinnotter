@@ -1,3 +1,4 @@
+from user.views import UserViewSet
 from model_bakery import baker
 from user.models import User
 import pytest
@@ -38,3 +39,10 @@ def block_json():
     return {
         'is_blocked': 'True'
     }
+
+
+@pytest.fixture()
+def userperm(mocker):
+    mock = mocker.MagicMock(return_value=True)
+    mocker.patch.object(UserViewSet, 'check_permissions', mock)
+    mocker.patch.object(UserViewSet, 'check_object_permissions', mock)

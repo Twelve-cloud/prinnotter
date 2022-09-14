@@ -55,14 +55,12 @@ class TestBlogServices:
         for user in users:
             page.follow_requests.add(user.pk)
 
-        for user in users:
-            assert user in page.follow_requests.all()
+        assert len(page.follow_requests.all()) == len(users)
 
         add_all_users_to_followers(page)
 
-        for user in users:
-            assert user not in page.follow_requests.all()
-            assert user in page.followers.all()
+        assert len(page.follow_requests.all()) == 0
+        assert len(page.followers.all()) == len(users)
 
     def test_remove_user_from_requests(self, page, user):
         page.follow_requests.add(user.pk)
@@ -71,6 +69,7 @@ class TestBlogServices:
         remove_user_from_requests(page, user.id)
 
         assert user not in page.follow_requests.all()
+        assert user not in page.followers.all()
 
         with pytest.raises(Http404):
             remove_user_from_requests(page, user_id=999)
@@ -79,10 +78,9 @@ class TestBlogServices:
         for user in users:
             page.follow_requests.add(user.pk)
 
-        for user in users:
-            assert user in page.follow_requests.all()
+        assert len(page.follow_requests.all()) == len(users)
 
         remove_all_users_from_requests(page)
 
-        for user in users:
-            assert user not in page.follow_requests.all()
+        assert len(page.follow_requests.all()) == 0
+        assert len(page.followers.all()) == 0
