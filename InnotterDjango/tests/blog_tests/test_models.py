@@ -1,4 +1,3 @@
-from blog.models import Tag, Page, Post
 import pytest
 
 
