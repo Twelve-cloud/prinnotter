@@ -3,7 +3,7 @@ name: test_on_push
 on: [push]
 
 jobs:
-  run_tests:
+  test:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@master
@@ -24,7 +24,7 @@ jobs:
      NAME: ${{ secrets.DOCKER_NAME }}
 
     steps:
-      - run:  echo ${{ secrets.DOCKER_PWD }} | docker login -u $LOGIN --password-stdin
+      - run: echo ${{ secrets.DOCKER_PWD }} | docker login -u $LOGIN --password-stdin
       - uses: actions/checkout@master
-      - run: cd InnotterDjango && docker build -t $NAME -f Dockerfile .
+      - run: cd InnotterDjango && docker build -t $LOGIN/$NAME -f Dockerfile .
       - run: docker push $LOGIN/$NAME
