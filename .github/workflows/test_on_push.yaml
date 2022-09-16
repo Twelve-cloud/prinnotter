@@ -14,7 +14,7 @@ jobs:
       - run: pip install poetry
       - run: cd InnotterDjango && poetry install
       - run: cd InnotterDjango && poetry run pytest --cov=.
-      - run: cd InnotterDjango && poetry run flake8 .
+      # - run: cd InnotterDjango && poetry run flake8 .
 
   build_and_pub:
     needs: [run_tests]
