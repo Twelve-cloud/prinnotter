@@ -74,6 +74,7 @@ jobs:
           envkey_DJANGO_SUPERUSER_EMAIL: ${{ secrets.DJANGO_SUPERUSER_EMAIL }}
           envkey_DJANGO_SUPERUSER_ROLE: ${{ secrets.DJANGO_SUPERUSER_ROLE }}
 
+          directory: InnotterDjango
           file_name: .env
 
 
