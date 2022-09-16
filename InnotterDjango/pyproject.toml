@@ -19,6 +19,7 @@ pytest-cov = "^3.0.0"
 pytest-mock = "^3.8.2"
 psycopg2-binary = "^2.9.3"
 Markdown = "^3.3.7"
+flake8 = "^5.0.4"
 
 [tool.poetry.dev-dependencies]
 
