@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   web:
-    build: ./InnotterDjango
+    image: twelvecloud/innotter-core-app
     volumes:
       - .:/InnotterDjango/code
     ports:
