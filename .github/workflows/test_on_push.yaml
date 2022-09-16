@@ -91,5 +91,11 @@ jobs:
       - name: pull docker image from hub.docker.com
         run: docker pull $LOGIN/$NAME
 
+      - name: ls
+        run: ls
+
+      - name: ls InnotterDjango
+        run: cd InnotterDjango && ls
+
       - name: run innotter-core-app
         run: docker-compose up
