@@ -3,7 +3,7 @@ name: test_on_push
 on: [push]
 
 jobs:
-  set-up-env:
+  run_tests:
     runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@master
@@ -15,3 +15,15 @@ jobs:
       - run: cd InnotterDjango && poetry install
       - run: cd InnotterDjango && poetry run pytest --cov=.
       - run: cd InnotterDjango && poetry run flake8 .
+
+  build_and_pub:
+    needs: [run_tests]
+    env:
+     LOGIN: ${{ secrets.DOCKER_LOGIN }}
+     NAME: ${{ secrets.DOCKER_NAME }}
+
+    steps:
+      - run:  echo ${{ secrets.DOCKER_PWD }} | docker login -u $LOGIN --password-stdin
+      - uses: actions/checkout@master
+      - run: docker build -t $NAME -f Dockerfile .
+      - run: docker push $LOGIN/$NAME
