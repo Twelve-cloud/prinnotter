@@ -60,7 +60,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: ls
-        run: echo ls
+        run: ls
 
       - name: make envfile
         uses: SpicyPizza/create-envfile@v1.3
@@ -80,7 +80,7 @@ jobs:
           envkey_DJANGO_SUPERUSER_EMAIL: ${{ secrets.DJANGO_SUPERUSER_EMAIL }}
           envkey_DJANGO_SUPERUSER_ROLE: ${{ secrets.DJANGO_SUPERUSER_ROLE }}
 
-          directory: ../..Innotter/InnotterDjango
+          directory: Innotter/InnotterDjango
           file_name: .env
 
 
