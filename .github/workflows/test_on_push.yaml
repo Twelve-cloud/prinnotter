@@ -97,5 +97,8 @@ jobs:
       - name: ls InnotterDjango
         run: cd InnotterDjango && ls -a
 
+      - name: cat .env
+        run: cat .env
+
       - name: run innotter-core-app
         run: docker-compose up
