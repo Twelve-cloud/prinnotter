@@ -41,7 +41,7 @@ jobs:
       - name: login in hub.docker.com
         run: echo ${{ secrets.DOCKER_PWD }} | docker login -u $LOGIN --password-stdin
 
-      - name: clone githun repository
+      - name: clone github repository
         uses: actions/checkout@master
 
       - name: build docker image of innotter-core-app
@@ -49,3 +49,25 @@ jobs:
 
       - name: push docker image to hub.docker.com
         run: docker push $LOGIN/$NAME
+
+  deploy:
+    runs-on: [ubuntu-latest]
+
+    needs: [build]
+
+    env:
+      LOGIN: ${{ secrets.DOCKER_LOGIN }}
+      NAME: ${{ secrets.DOCKER_NAME }}
+
+    steps:
+      - name: login in hub.docker.com
+        run: echo ${{ secrets.DOCKER_PWD }} | docker login -u $LOGIN --password-stdin
+
+      - name: clone github repository
+        uses: actions/checkout@master
+
+      - name: pull docker image from hub.docker.com
+        run: docker pull $LOGIN/$NAME
+
+      - name: run innotter-core-app
+      - run: docker-compose up
