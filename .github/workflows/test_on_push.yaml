@@ -60,7 +60,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: ls
-        uses: echo ls
+        run: echo ls
 
       - name: make envfile
         uses: SpicyPizza/create-envfile@v1.3
