@@ -12,4 +12,4 @@ RUN poetry install
 
 COPY . /code
 RUN chmod +x ./entrypoint.sh
-CMD ./entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]
