@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from pathlib import Path
+import dj_database_url
 import os
 
 
@@ -78,6 +79,12 @@ DATABASES = {
         'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE', '0'))
     }
 }
+
+if "DATABASE_URL" in os.environ:
+    DATABASES["default"] = dj_database_url.config(
+        conn_max_age=int(os.getenv('CONN_MAX_AGE', '0')),
+        ssl_require=True
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {
