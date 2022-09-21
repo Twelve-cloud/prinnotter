@@ -29,17 +29,28 @@ jobs:
         run: cd InnotterDjango && poetry run flake8 .
 
 
-  build:
+    build:
     runs-on: [ubuntu-latest]
 
     needs: [test]
 
+    env:
+     LOGIN: ${{ secrets.DOCKER_LOGIN }}
+     NAME: ${{ secrets.DOCKER_NAME }}
+     PWD: ${{ secrets.DOCKER_PWD }}
+
     steps:
+      - name: login in hub.docker.com
+        run: echo $PWD | docker login -u $LOGIN --password-stdin
+
       - name: clone github repository
         uses: actions/checkout@master
 
       - name: build docker image of innotter-core-app
-        run: cd InnotterDjango && docker build -t web -f Dockerfile .
+        run: cd InnotterDjango && docker build -t $LOGIN/$NAME -f Dockerfile .
+
+      - name: push docker image to hub.docker.com
+        run: docker push $LOGIN/$NAME
 
 
   deploy:
@@ -52,9 +63,12 @@ jobs:
      APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
 
     steps:
-      - name: push image to heroku
-        run: HEROKU_API_KEY=$API_KEY heroku container:push web -a $APP_NAME
+      - name: pull docker image from hub.docker.com
+        run: docker pull twelvecloud/innotter-core-app
 
-      - name: release image to innotter-core-app
-        run: HEROKU_API_KEY=$API_KEY heroku container:release web -a $APP_NAME
+      - name: push docker image to heroku
+        run: HEROKU_API_KEY=$API_KEY heroku container:push twelvecloud/innotter-core-app -a $APP_NAME
+
+      - name: release docker image to innotter-core-app
+        run: HEROKU_API_KEY=$API_KEY heroku container:release twelvecloud/innotter-core-app -a $APP_NAME
 #------------------------------------------------------------------------------
