@@ -35,6 +35,9 @@ jobs:
     needs: [test]
 
     steps:
+      - name: clone github repository
+        uses: actions/checkout@master
+
       - name: build docker image of innotter-core-app
         run: cd InnotterDjango && docker build -t web -f Dockerfile .
 
