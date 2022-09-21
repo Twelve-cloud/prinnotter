@@ -1,5 +1,0 @@
-build:
-  docker:
-    web: InnotterDjango/Dockerfile
-run:
-  web: ./entrypoint.sh

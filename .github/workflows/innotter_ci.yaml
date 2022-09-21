@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on: [push]
 
@@ -34,20 +34,24 @@ jobs:
 
     needs: [test]
 
+    steps:
+      - name: build docker image of innotter-core-app
+        run: cd InnotterDjango && docker build -t web -f Dockerfile .
+
+
+  deploy:
+    runs-on: [ubuntu-latest]
+
+    needs: [build]
+
     env:
-     LOGIN: ${{ secrets.DOCKER_LOGIN }}
-     NAME: ${{ secrets.DOCKER_NAME }}
+     API_KEY: ${{ secrets.HEROKU_API_KEY }}
+     APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
 
     steps:
-      - name: login in hub.docker.com
-        run: echo ${{ secrets.DOCKER_PWD }} | docker login -u $LOGIN --password-stdin
+      - name: push image to heroku
+        run: HEROKU_API_KEY=$API_KEY heroku container:push web -a $APP_NAME
 
-      - name: clone github repository
-        uses: actions/checkout@master
-
-      - name: build docker image of innotter-core-app
-        run: cd InnotterDjango && docker build -t $LOGIN/$NAME -f Dockerfile .
-
-      - name: push docker image to hub.docker.com
-        run: docker push $LOGIN/$NAME
+      - name: release image to innotter-core-app
+        run: HEROKU_API_KEY=$API_KEY heroku container:release web -a $APP_NAME
 #------------------------------------------------------------------------------
