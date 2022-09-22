@@ -65,8 +65,11 @@ jobs:
       - name: pull docker image from hub.docker.com
         run: docker pull twelvecloud/innotter-core-app
 
+      - name: tag docker image
+        run: sudo docker tag twelvecloud/innotter-core-app registry.heroku.com/$APP_NAME/web
+
       - name: push docker image to heroku
-        run: HEROKU_API_KEY=$API_KEY heroku container:push twelvecloud/innotter-core-app -a $APP_NAME
+        run: sudo docker push registry.heroku.com/innotter/web
 
       - name: release docker image to innotter-core-app
-        run: HEROKU_API_KEY=$API_KEY heroku container:release twelvecloud/innotter-core-app -a $APP_NAME
+        run: HEROKU_API_KEY=$API_KEY heroku container:release web -a $APP_NAME
