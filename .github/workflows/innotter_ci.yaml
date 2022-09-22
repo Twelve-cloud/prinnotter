@@ -19,17 +19,14 @@ jobs:
       - name: install poetry
         run: pip install poetry
 
-      - name: move to innotter-core-app directory
-        run: cd InnotterDjango
-
       - name: create venv and install innotter-core-app dependencies
-        run: poetry install
+        run: cd InnotterDjango && poetry install
 
       - name: run tests for innotter-core-app
-        run: poetry run pytest --cov=.
+        run: cd InnotterDjango && poetry run pytest --cov=.
 
       - name: run linter for innotter-core-app
-        run: poetry run flake8 .
+        run: cd InnotterDjango && poetry run flake8 .
 
 
   build:
