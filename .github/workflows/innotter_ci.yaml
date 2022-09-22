@@ -58,20 +58,19 @@ jobs:
     needs: [build]
 
     env:
-      DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
-      DOCKER_NAME: ${{ secrets.DOCKER_NAME }}
+      DOCKER_IMAGE: ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}
       HEROKU_KEY: ${{ secrets.HEROKU_KEY }}
       HEROKU_APP: ${{ secrets.HEROKU_APP }}
 
     steps:
       - name: pull docker image from hub.docker.com
-        run: docker pull $DOCKER_LOGIN/$DOCKER_NAME
+        run: docker pull $DOCKER_IMAGE
 
       - name: tag docker image for heroku
-        run: sudo docker tag $DOCKER_LOGIN/$DOCKER_NAME registry.heroku.com/$HEROKU_APP/web
+        run: sudo docker tag $DOCKER_IMAGE registry.heroku.com/$HEROKU_APP/web
 
       - name: push docker image to heroku
-        run: sudo docker push registry.heroku.com/$HEROKU_APP/web
+        run: HEROKU_API_KEY=$HEROKU_KEY sudo docker push registry.heroku.com/$HEROKU_APP/web
 
-      - name: release app in production
+      - name: release app to production
         run: HEROKU_API_KEY=$HEROKU_KEY heroku container:release web -a $HEROKU_APP
