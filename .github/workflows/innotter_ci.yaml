@@ -37,10 +37,11 @@ jobs:
     env:
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
       NAME: ${{ secrets.DOCKER_NAME }}
+      PWD: ${{ secrets.DOCKER_PWD }}
 
     steps:
       - name: login in hub.docker.com
-        run: echo ${{ secrets.DOCKER_PWD }} | docker login -u $LOGIN --password-stdin
+        run: echo $PWD | docker login -u $LOGIN --password-stdin
 
       - name: clone github repository
         uses: actions/checkout@master
@@ -58,18 +59,20 @@ jobs:
     needs: [build]
 
     env:
-      API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+      DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
+      DOCKER_NAME: ${{ secrets.DOCKER_NAME }}
+      HEROKU_KEY: ${{ secrets.HEROKU_KEY }}
+      HEROKU_APP: ${{ secrets.HEROKU_APP }}
 
     steps:
       - name: pull docker image from hub.docker.com
-        run: docker pull twelvecloud/innotter-core-app
+        run: docker pull $DOCKER_LOGIN/$DOCKER_NAME
 
       - name: tag docker image
-        run: sudo docker tag twelvecloud/innotter-core-app registry.heroku.com/$APP_NAME/web
+        run: sudo docker tag $DOCKER_LOGIN/$DOCKER_NAME registry.heroku.com/$HEROKU_APP/web
 
       - name: push docker image to heroku
         run: sudo docker push registry.heroku.com/innotter/web
 
       - name: release docker image to innotter-core-app
-        run: HEROKU_API_KEY=$API_KEY heroku container:release web -a $APP_NAME
+        run: HEROKU_API_KEY=$HEROKU_KEY heroku container:release web -a $HEROKU_APP
