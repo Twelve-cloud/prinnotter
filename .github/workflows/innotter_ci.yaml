@@ -29,50 +29,21 @@ jobs:
         run: cd InnotterDjango && poetry run flake8 .
 
 
-  build:
+  build-deploy:
     runs-on: [ubuntu-latest]
 
     needs: [test]
 
     env:
-      LOGIN: ${{ secrets.DOCKER_LOGIN }}
-      NAME: ${{ secrets.DOCKER_NAME }}
-      PWD: ${{ secrets.DOCKER_PWD }}
-
-    steps:
-      - name: login in hub.docker.com
-        run: echo $PWD | docker login -u $LOGIN --password-stdin
-
-      - name: clone github repository
-        uses: actions/checkout@master
-
-      - name: build docker image of innotter-core-app
-        run: cd InnotterDjango && docker build -t $LOGIN/$NAME -f Dockerfile .
-
-      - name: push docker image to hub.docker.com
-        run: docker push $LOGIN/$NAME
-
-
-  deploy:
-    runs-on: [ubuntu-latest]
-
-    needs: [build]
-
-    env:
-      DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
-      DOCKER_NAME: ${{ secrets.DOCKER_NAME }}
       HEROKU_KEY: ${{ secrets.HEROKU_KEY }}
       HEROKU_APP: ${{ secrets.HEROKU_APP }}
 
     steps:
-      - name: pull docker image from hub.docker.com
-        run: docker pull $DOCKER_LOGIN/$DOCKER_NAME
+      - name: clone github repository
+        uses: actions/checkout@master
 
-      - name: tag docker image
-        run: sudo docker tag $DOCKER_LOGIN/$DOCKER_NAME registry.heroku.com/$HEROKU_APP/web
-
-      - name: push docker image to heroku
-        run: sudo docker push registry.heroku.com/innotter/web
+      - name: build docker image of innotter-core-app and push it to heroku
+        run: cd InnotterDjango && HEROKU_API_KEY=$HEROKU_KEY sudo heroku container:push web -a $HEROKU_APP
 
       - name: release docker image to innotter-core-app
         run: HEROKU_API_KEY=$HEROKU_KEY heroku container:release web -a $HEROKU_APP
