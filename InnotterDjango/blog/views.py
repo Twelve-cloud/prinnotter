@@ -20,6 +20,7 @@ from user.serializers import UserSerializer
 from rest_framework import viewsets, mixins
 from blog.models import Tag, Page, Post
 from rest_framework import status
+from itertools import chain
 
 
 class TagViewSet(mixins.CreateModelMixin,
@@ -262,4 +263,13 @@ def search(request):
             data={'GET params are not valid'},
             status=status.HTTP_400_BAD_REQUEST
         )
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def news(request):
+    pages = request.user.pages.all() | request.user.follows.all()
+    posts = list(chain(*[page.posts.all() for page in pages]))
+    posts.sort(key=lambda post: post.created_at, reverse=True)
+    serializer = PostSerializer(posts, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
