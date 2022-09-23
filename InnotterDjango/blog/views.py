@@ -6,14 +6,17 @@ from blog.permissions import (
 from blog.services import (
     set_blocking, follow_page, like_or_unlike_post,
     add_user_to_followers, add_all_users_to_followers,
-    remove_user_from_requests, remove_all_users_from_requests
+    remove_user_from_requests, remove_all_users_from_requests,
+    search_pages_by_params
 )
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action, api_view
+from user.services import search_users_by_params
 from user.permissions import IsAdminOrModerator
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import action
 from rest_framework.response import Response
+from user.serializers import UserSerializer
 from rest_framework import viewsets, mixins
 from blog.models import Tag, Page, Post
 from rest_framework import status
@@ -118,6 +121,9 @@ class PageViewSet(viewsets.ModelViewSet):
             IsPageNotBlocked,
             IsPagePrivate
         ),
+        'search': (
+            IsAuthenticated,
+        )
     }
 
     def get_permissions(self):
@@ -235,3 +241,25 @@ class PostViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(request, page)
         like_or_unlike_post(post, request.user)
         return Response('Success', status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def search(request):
+    acceptable_page_params = {'name', 'uuid', 'tags'}
+    acceptable_user_params = {'username', 'first_name', 'last_name'}
+
+    type = request.GET.get('type', None)
+    params = {k: v for k, v in request.GET.items() if k != 'type'}
+
+    if type == 'page' and set(params).issubset(acceptable_page_params):
+        pages = search_pages_by_params(**params)
+        serializer = PageSerializer(pages, many=True)
+    elif type == 'user' and set(params).issubset(acceptable_user_params):
+        users = search_users_by_params(**params)
+        serializer = UserSerializer(users, many=True)
+    else:
+        return Response(
+            data={'GET params are not valid'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    return Response(serializer.data, status=status.HTTP_200_OK)
