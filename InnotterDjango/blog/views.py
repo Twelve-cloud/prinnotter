@@ -248,9 +248,8 @@ class PostViewSet(viewsets.ModelViewSet):
 def search(request):
     acceptable_page_params = {'name', 'uuid', 'tags'}
     acceptable_user_params = {'username', 'first_name', 'last_name'}
-
-    type = request.GET.get('type', None)
-    params = {k: v for k, v in request.GET.items() if k != 'type'}
+    params = request.GET.copy()
+    type = params.pop('type', None)
 
     if type == 'page' and set(params).issubset(acceptable_page_params):
         pages = search_pages_by_params(**params)
@@ -259,10 +258,7 @@ def search(request):
         users = search_users_by_params(**params)
         serializer = UserSerializer(users, many=True)
     else:
-        return Response(
-            data={'GET params are not valid'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response('GET params are not valid', status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
