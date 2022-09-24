@@ -1,5 +1,5 @@
 from blog.views import PageViewSet, PostViewSet
-from blog.models import Tag, Page, Post
+from blog.models import Tag, Post
 from model_bakery import baker
 import pytest
 
@@ -7,11 +7,6 @@ import pytest
 @pytest.fixture()
 def tag():
     return baker.make(Tag)
-
-
-@pytest.fixture()
-def page(user):
-    return baker.make(Page, owner=user)
 
 
 @pytest.fixture()

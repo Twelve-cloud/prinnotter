@@ -1,4 +1,4 @@
-from blog.views import TagViewSet, PageViewSet, PostViewSet
+from blog.views import TagViewSet, PageViewSet, PostViewSet, search, news
 from rest_framework.permissions import IsAuthenticated
 from blog.models import Page, Post
 from rest_framework import status
@@ -145,3 +145,33 @@ class TestPostViewSet:
 
         assert len(post.users_liked.all()) == 1
         assert response.status_code == status.HTTP_200_OK
+
+
+class TestSearchAndNews:
+    def test_search(self, api_factory, user, page):
+        request = api_factory.get('/api/v1/blog/search/')
+        request.user = user
+
+        response = search(request)
+        assert response.data == 'GET params are not valid'
+
+        request.GET = {'type': 'user', 'username': user.username}
+        response = search(request)
+        assert response.data[0]['username'] == user.username
+
+        request.GET = {'type': 'page', 'name': page.name}
+        response = search(request)
+        assert response.data[0]['name'] == page.name
+
+    def test_news(self, api_factory, user, moder, page, post):
+        request = api_factory.get('/api/v1/blog/news/')
+
+        request.user = user
+        user.pages.add(page)
+        response = news(request)
+        assert response.data[0]['id'] == post.id
+
+        request.user = moder
+        moder.follows.add(page)
+        response = news(request)
+        assert response.data[0]['id'] == post.id
