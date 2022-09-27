@@ -9,7 +9,7 @@ class AWSMeta(type):
                 classdict['service_name'],
                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                region_name=settings.AWS_REGION_NAME
+                region_name=settings.AWS_REGION_NAME if settings.AWS_REGION_NAME else 'us-west-2'
             )
         else:
             raise 'Fatal error: service_name must be specified!'
