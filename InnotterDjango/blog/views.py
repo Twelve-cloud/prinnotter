@@ -7,7 +7,7 @@ from blog.services import (
     set_blocking, follow_page, like_or_unlike_post,
     add_user_to_followers, add_all_users_to_followers,
     remove_user_from_requests, remove_all_users_from_requests,
-    search_pages_by_params
+    search_pages_by_params, send_notification_to_followers
 )
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -228,6 +228,12 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        parent_page_id = self.kwargs.get('parent_lookup_page_id')
+        posts_url = request.build_absolute_uri()
+        send_notification_to_followers(parent_page_id, posts_url)
+        return super().create(request, args, kwargs)
 
     def list(self, request, *args, **kwargs):
         parent_page_id = self.kwargs.get('parent_lookup_page_id')

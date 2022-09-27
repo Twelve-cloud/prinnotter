@@ -8,9 +8,9 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-IS_HEROKU = "DYNO" in os.environ
-
 SECRET_KEY = os.getenv('SECRET_KEY')
+
+IS_HEROKU = "DYNO" in os.environ
 
 if IS_HEROKU:
     DEBUG = False
@@ -73,7 +73,7 @@ DATABASES = {
         'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
         'NAME': os.getenv('POSTGRES_DB', 'innotter_db'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+        'PORT': int(os.getenv('POSTGRES_PORT')),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE', '0'))
@@ -134,3 +134,27 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# --------------------------- RabbitMQ Configuration --------------------------
+
+RABBITMQ = {
+    'PROTOCOL': os.getenv('RABBITMQ_PROTOCOL'),
+    'HOST': os.getenv('RABBITMQ_HOST'),
+    'PORT': os.getenv('RABBITMQ_PORT'),
+    'USER': os.getenv('RABBITMQ_USER'),
+    'PASSWORD': os.getenv('RABBITMQ_PASSWORD'),
+}
+
+CELERY_BROKER_URL = CELERY_BROKER_URL = (
+    f"{RABBITMQ['PROTOCOL']}://{RABBITMQ['USER']}:"
+    f"{RABBITMQ['PASSWORD']}@{RABBITMQ['HOST']}:{RABBITMQ['PORT']}"
+)
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+
+# -------------------------- AWS Configuration --------------------------------
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_REGION_NAME = os.getenv('AWS_REGION_NAME')
+AWS_MAIL_SENDER = os.getenv('AWS_MAIL_SENDER')

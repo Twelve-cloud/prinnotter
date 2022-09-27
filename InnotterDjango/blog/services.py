@@ -1,3 +1,4 @@
+from blog.tasks import send_notification_about_new_post
 from django.shortcuts import get_object_or_404
 from blog.models import Page, Post
 from user.models import User
@@ -86,3 +87,14 @@ def search_pages_by_params(*args: tuple, **kwargs: dict) -> List[Page]:
     search_pages_by_params: returns pages were found by params.
     """
     return Page.objects.filter(**kwargs)
+
+
+def send_notification_to_followers(parent_page_id: int, posts_url: str) -> None:
+    """
+    send_notification_to_followers: send notification to all followers
+    of a page about new post.
+    """
+    page = Page.objects.get(pk=parent_page_id)
+    user_ids = page.followers.all()
+    user_emails = [user.email for user in User.objects.filter(id__in=user_ids)]
+    send_notification_about_new_post.delay(page.name, user_emails, posts_url)

@@ -11,5 +11,4 @@ RUN poetry config virtualenvs.in-project true
 RUN poetry install
 
 COPY . /code
-RUN chmod +x ./entrypoint.sh
-ENTRYPOINT ["./entrypoint.sh"]
+RUN chmod +x django-entrypoint.sh && chmod +x celery-entrypoint.sh
