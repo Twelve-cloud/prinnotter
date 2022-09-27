@@ -73,7 +73,7 @@ DATABASES = {
         'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
         'NAME': os.getenv('POSTGRES_DB', 'innotter_db'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': int(os.getenv('POSTGRES_PORT')),
+        'PORT': os.getenv('POSTGRES_PORT'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE', '0'))
