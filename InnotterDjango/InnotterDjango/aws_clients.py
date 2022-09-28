@@ -44,3 +44,28 @@ class SESClient(metaclass=AWSMeta):
                 }
             }
         )
+
+    @classmethod
+    def send_email_to_verify_account(cls, email, verify_url):
+        cls.client.send_email(
+            Source=settings.AWS_MAIL_SENDER,
+            Destination={
+                'ToAddresses': [email],
+                'BccAddresses': [email]
+            },
+            Message={
+                'Subject': {
+                    'Data': 'Verify account!',
+                    'Charset': 'UTF-8'
+                },
+                'Body': {
+                    'Html': {
+                        'Data': (
+                            f'Click the link below to verify account.<br>'
+                            f'<b><a href="{verify_url}">{verify_url}</a></b>'
+                        ),
+                        'Charset': 'UTF-8'
+                    }
+                }
+            }
+        )

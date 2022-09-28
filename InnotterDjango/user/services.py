@@ -1,4 +1,6 @@
+from InnotterDjango.tasks import send_email_to_verify_account
 from blog.services import set_blocking as block_page
+from jwt_auth.services import generate_token
 from datetime import datetime, timedelta
 from user.models import User
 from typing import List
@@ -32,3 +34,11 @@ def search_users_by_params(*args: tuple, **kwargs: dict) -> List[User]:
     search_users_by_params: returns users were found by params.
     """
     return User.objects.filter(**kwargs)
+
+
+def send_verification_link(link: str, email: str) -> None:
+    """
+    send_verification_link: send verification link to user email.
+    """
+    verify_url = link + '?token=' + generate_token(type='access', user_id=email)
+    send_email_to_verify_account.delay(email, verify_url)

@@ -1,5 +1,6 @@
 from jwt_auth.services import set_tokens_to_cookie, get_payload_by_token
 from jwt_auth.serializers import SignInSerializer
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -40,3 +41,20 @@ class AuthViewSet(viewsets.GenericViewSet):
         # It will remove refresh token from cookie
         # and request to /auth/jwt/sign_in
         # without any tokens in a cookie
+
+    @action(detail=False, methods=['get'])
+    def verify_email(self, request):
+        user_token = request.GET.get('token', None)
+        payload = get_payload_by_token(user_token)
+
+        if payload is None:
+            return Response(
+                data={'Error': 'Verify link'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = get_object_or_404(User, email=payload.get('sub'))
+        user.is_verified = True
+        user.save()
+
+        return Response(data={'Verification': 'OK'}, status=status.HTTP_200_OK)

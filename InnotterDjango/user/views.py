@@ -1,8 +1,11 @@
 from user.permissions import (
     IsNotAuthentificatedOrAdmin, IsUserOwnerOrAdmin, IsAdmin, IsUserOwner
 )
-from user.services import set_blocking, block_all_users_pages
+from user.services import (
+    set_blocking, block_all_users_pages, send_verification_link
+)
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,6 +13,7 @@ from user.serializers import UserSerializer
 from blog.serializers import PostSerializer
 from rest_framework import viewsets
 from rest_framework import status
+from django.urls import reverse
 from user.models import User
 
 
@@ -52,6 +56,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        if isinstance(request.user, AnonymousUser):
+            link = request.build_absolute_uri(reverse('jwt-verify-email'))
+            send_verification_link(link, request.data['email'])
+        return super().create(request, args, kwargs)
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):

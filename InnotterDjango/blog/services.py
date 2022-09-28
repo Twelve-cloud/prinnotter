@@ -1,4 +1,4 @@
-from blog.tasks import send_notification_about_new_post
+from InnotterDjango.tasks import send_notification_about_new_post
 from django.shortcuts import get_object_or_404
 from blog.models import Page, Post
 from user.models import User
