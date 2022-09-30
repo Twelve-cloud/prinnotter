@@ -57,6 +57,11 @@ class UserViewSet(viewsets.ModelViewSet):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
 
+    def perform_create(self, serializer):
+        request = serializer.context['request']
+        is_verif = False if isinstance(request.user, AnonymousUser) else True
+        serializer.save(is_verified=is_verif)
+
     def create(self, request, *args, **kwargs):
         if isinstance(request.user, AnonymousUser):
             link = request.build_absolute_uri(reverse('jwt-verify-email'))
