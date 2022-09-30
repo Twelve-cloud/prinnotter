@@ -1,26 +1,12 @@
+from InnotterDjango.aws_metaclass import AWSMeta
 from django.conf import settings
-import boto3
-
-
-class AWSMeta(type):
-    def __new__(meta, classname, supers, classdict):
-        if 'service_name' in classdict:
-            classdict['client'] = boto3.client(
-                classdict['service_name'],
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                region_name=settings.AWS_REGION_NAME if settings.AWS_REGION_NAME else 'us-west-2'
-            )
-        else:
-            raise 'Fatal error: service_name must be specified!'
-        return type.__new__(meta, classname, supers, classdict)
 
 
 class SESClient(metaclass=AWSMeta):
     service_name = 'ses'
 
     @classmethod
-    def send_email_about_new_post(cls, page_name, emails, posts_url):
+    def send_email_about_new_post(cls, page_name: str, emails: list, posts_url: str) -> None:
         cls.client.send_email(
             Source=settings.AWS_MAIL_SENDER,
             Destination={
@@ -46,7 +32,7 @@ class SESClient(metaclass=AWSMeta):
         )
 
     @classmethod
-    def send_email_to_verify_account(cls, email, verify_url):
+    def send_email_to_verify_account(cls, email: str, verify_url: str) -> None:
         cls.client.send_email(
             Source=settings.AWS_MAIL_SENDER,
             Destination={

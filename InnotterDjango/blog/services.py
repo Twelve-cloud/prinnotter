@@ -95,6 +95,5 @@ def send_notification_to_followers(parent_page_id: int, posts_url: str) -> None:
     of a page about new post.
     """
     page = Page.objects.get(pk=parent_page_id)
-    user_ids = page.followers.all()
-    user_emails = [user.email for user in User.objects.filter(id__in=user_ids)]
+    user_emails = list(page.followers.values_list('email', flat=True))
     send_notification_about_new_post.delay(page.name, user_emails, posts_url)

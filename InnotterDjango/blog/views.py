@@ -179,6 +179,14 @@ class PageViewSet(viewsets.ModelViewSet):
         remove_all_users_from_requests(page)
         return Response('Success', status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'])
+    def news(self, request):
+        pages = request.user.pages.all() | request.user.follows.all()
+        posts = list(chain(*[page.posts.all() for page in pages]))
+        posts.sort(key=lambda post: post.created_at, reverse=True)
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
@@ -265,13 +273,4 @@ def search(request):
         serializer = UserSerializer(users, many=True)
     else:
         return Response('GET params are not valid', status=status.HTTP_400_BAD_REQUEST)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def news(request):
-    pages = request.user.pages.all() | request.user.follows.all()
-    posts = list(chain(*[page.posts.all() for page in pages]))
-    posts.sort(key=lambda post: post.created_at, reverse=True)
-    serializer = PostSerializer(posts, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

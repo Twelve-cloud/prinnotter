@@ -1,6 +1,8 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 from django.conf import settings
+from user.models import User
 from typing import Optional
 import jwt
 
@@ -65,3 +67,9 @@ def get_payload_by_token(token: str) -> Optional[dict]:
         return payload
     except (jwt.InvalidTokenError, jwt.ExpiredSignatureError, jwt.DecodeError):
         return None
+
+
+def verify_user(email: str) -> None:
+    user = get_object_or_404(User, email=email)
+    user.is_verified = True
+    user.save()

@@ -20,5 +20,4 @@ urlpatterns = router.urls
 
 urlpatterns += [
     path('search/', views.search),
-    path('news/', views.news),
 ]

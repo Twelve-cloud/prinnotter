@@ -58,9 +58,9 @@ class UserViewSet(viewsets.ModelViewSet):
         return super(self.__class__, self).get_permissions()
 
     def perform_create(self, serializer):
-        request = serializer.context['request']
-        is_verif = False if isinstance(request.user, AnonymousUser) else True
-        serializer.save(is_verified=is_verif)
+        user = serializer.context['request'].user
+        is_verified = False if isinstance(user, AnonymousUser) else True
+        serializer.save(is_verified=is_verified)
 
     def create(self, request, *args, **kwargs):
         if isinstance(request.user, AnonymousUser):

@@ -1,4 +1,4 @@
-from blog.views import TagViewSet, PageViewSet, PostViewSet, search, news
+from blog.views import TagViewSet, PageViewSet, PostViewSet, search
 from rest_framework.permissions import IsAuthenticated
 from blog.models import Page, Post
 from rest_framework import status
@@ -14,6 +14,7 @@ accept_view = PageViewSet.as_view({'patch': 'accept'})
 accept_all_view = PageViewSet.as_view({'patch': 'accept_all'})
 decline_view = PageViewSet.as_view({'patch': 'decline'})
 decline_all_view = PageViewSet.as_view({'patch': 'decline_all'})
+news_view = PageViewSet.as_view({'get': 'news'})
 
 list_view = PostViewSet.as_view({'get': 'list'})
 like_view = PostViewSet.as_view({'patch': 'like'})
@@ -108,6 +109,19 @@ class TestPageViewSet:
         assert len(page.followers.all()) == 0
         assert response.status_code == status.HTTP_200_OK
 
+    def test_news(self, api_factory, user, moder, page, post):
+        request = api_factory.get('/api/v1/blog/pages/news/')
+
+        request.user = user
+        user.pages.add(page)
+        response = news_view(request)
+        assert response.data[0]['id'] == post.id
+
+        request.user = moder
+        moder.follows.add(page)
+        response = news_view(request)
+        assert response.data[0]['id'] == post.id
+
 
 class TestPostViewSet:
     def test_get_permissions(self):
@@ -147,7 +161,7 @@ class TestPostViewSet:
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestSearchAndNews:
+class TestSearch:
     def test_search(self, api_factory, user, page):
         request = api_factory.get('/api/v1/blog/search/')
         request.user = user
@@ -162,16 +176,3 @@ class TestSearchAndNews:
         request.GET = {'type': 'page', 'name': page.name}
         response = search(request)
         assert response.data[0]['name'] == page.name
-
-    def test_news(self, api_factory, user, moder, page, post):
-        request = api_factory.get('/api/v1/blog/news/')
-
-        request.user = user
-        user.pages.add(page)
-        response = news(request)
-        assert response.data[0]['id'] == post.id
-
-        request.user = moder
-        moder.follows.add(page)
-        response = news(request)
-        assert response.data[0]['id'] == post.id
