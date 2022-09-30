@@ -24,14 +24,14 @@ class TestTagViewSet:
     def test_get_permissions(self):
         self = TagViewSet()
         self.action = 'list'
-        self.get_permissions() is IsAuthenticated
+        assert isinstance(self.get_permissions()[0], IsAuthenticated) is True
 
 
 class TestPageViewSet:
     def test_get_permissions(self):
         self = PageViewSet()
         self.action = 'list'
-        self.get_permissions() is IsAuthenticated
+        assert isinstance(self.get_permissions()[0], IsAuthenticated) is True
 
     def test_block(self, api_factory, page, block_json, pageperm):
         request = api_factory.patch('', block_json, format='json')
@@ -127,7 +127,7 @@ class TestPostViewSet:
     def test_get_permissions(self):
         self = PostViewSet()
         self.action = 'list'
-        self.get_permissions() is IsAuthenticated
+        assert isinstance(self.get_permissions()[0], IsAuthenticated) is True
 
     def test_get_queryset(self, page, mocker):
         mock = mocker.MagicMock()
