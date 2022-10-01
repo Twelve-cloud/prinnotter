@@ -12,10 +12,10 @@ pytestmark = pytest.mark.django_db
 
 class TestTasks:
     def test_send_notification_about_new_posts(self, mocker):
-        send_notification = mocker.MagicMock()
-        mocker.patch.object(aws_ses_client.SESClient, 'send_email_about_new_post', send_notification)
+        send_notif = mocker.MagicMock()
+        mocker.patch.object(aws_ses_client.SESClient, 'send_email_about_new_post', send_notif)
         send_notification_about_new_post(..., ..., ...)
-        send_notification.assert_called_once()
+        send_notif.assert_called_once()
 
     def test_send_email_to_verify_account(self, mocker):
         send_email = mocker.MagicMock()
