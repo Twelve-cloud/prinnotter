@@ -42,5 +42,8 @@ jobs:
       - name: clone github repository
         uses: actions/checkout@master
 
+      - name: login in heroku.regestry
+        uses: docker login --username=_ --password=$HEROKU_KEY registry.heroku.com
+
       - name: build docker image of innotter-core-app, push it to heroku and release
         run: cd InnotterDjango && HEROKU_API_KEY=$HEROKU_KEY heroku container:push release -a $HEROKU_APP
