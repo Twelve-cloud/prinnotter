@@ -35,7 +35,7 @@ jobs:
     needs: [test]
 
     env:
-      HEROKU_KEY: ${{ secrets.HEROKU_KEY }}
+      HEROKU_API_KEY: ${{ secrets.HEROKU_KEY }}
       HEROKU_APP: ${{ secrets.HEROKU_APP }}
 
     steps:
@@ -43,4 +43,4 @@ jobs:
         uses: actions/checkout@master
 
       - name: build docker image of innotter-core-app, push it to heroku and release
-        run: cd InnotterDjango && HEROKU_API_KEY=$HEROKU_KEY sudo heroku container:push release -a $HEROKU_APP
+        run: cd InnotterDjango && sudo heroku container:push release -a $HEROKU_APP
