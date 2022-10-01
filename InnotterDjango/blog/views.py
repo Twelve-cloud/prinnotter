@@ -7,19 +7,21 @@ from blog.services import (
     set_blocking, follow_page, like_or_unlike_post,
     add_user_to_followers, add_all_users_to_followers,
     remove_user_from_requests, remove_all_users_from_requests,
-    search_pages_by_params, send_notification_to_followers
+    send_notification_to_followers
 )
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action, api_view
-from user.services import search_users_by_params
 from user.permissions import IsAdminOrModerator
 from django.shortcuts import get_object_or_404
+from blog.exceptions import InvalidFilterType
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from user.serializers import UserSerializer
 from rest_framework import viewsets, mixins
 from blog.models import Tag, Page, Post
+from rest_framework import generics
 from rest_framework import status
+from user.models import User
 from itertools import chain
 
 
@@ -258,19 +260,20 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response('Success', status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-def search(request):
+class UserPageFilter(generics.ListAPIView):
     acceptable_page_params = {'name', 'uuid', 'tags'}
     acceptable_user_params = {'username', 'first_name', 'last_name'}
-    params = request.GET.copy()
-    type = params.pop('type', None)
 
-    if type == 'page' and set(params).issubset(acceptable_page_params):
-        pages = search_pages_by_params(**params)
-        serializer = PageSerializer(pages, many=True)
-    elif type == 'user' and set(params).issubset(acceptable_user_params):
-        users = search_users_by_params(**params)
-        serializer = UserSerializer(users, many=True)
-    else:
-        return Response('GET params are not valid', status=status.HTTP_400_BAD_REQUEST)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        params = {key: value for key, value in self.request.GET.items()}
+        type = params.pop('type', None)
+
+        if type == 'page' and set(params).issubset(self.acceptable_page_params):
+            self.serializer_class = PageSerializer
+            return Page.objects.filter(**params)
+        elif type == 'user' and set(params).issubset(self.acceptable_user_params):
+            print('here', params)
+            self.serializer_class = UserSerializer
+            return User.objects.filter(**params)
+        else:
+            raise InvalidFilterType()

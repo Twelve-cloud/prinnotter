@@ -2,7 +2,6 @@ from InnotterDjango.tasks import send_notification_about_new_post
 from django.shortcuts import get_object_or_404
 from blog.models import Page, Post
 from user.models import User
-from typing import List
 import datetime
 
 
@@ -80,13 +79,6 @@ def remove_all_users_from_requests(page: Page) -> None:
     """
     for user in page.follow_requests.all():
         remove_user_from_requests(page, user.pk)
-
-
-def search_pages_by_params(*args: tuple, **kwargs: dict) -> List[Page]:
-    """
-    search_pages_by_params: returns pages were found by params.
-    """
-    return Page.objects.filter(**kwargs)
 
 
 def send_notification_to_followers(parent_page_id: int, posts_url: str) -> None:

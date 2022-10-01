@@ -3,7 +3,6 @@ from blog.services import set_blocking as block_page
 from jwt_auth.services import generate_token
 from datetime import datetime, timedelta
 from user.models import User
-from typing import List
 
 
 def set_blocking(user: User, is_blocked: bool) -> None:
@@ -27,13 +26,6 @@ def block_all_users_pages(user: User, is_blocked: bool) -> None:
 
     for page in user.pages.all():
         block_page(page, blocking_period)
-
-
-def search_users_by_params(*args: tuple, **kwargs: dict) -> List[User]:
-    """
-    search_users_by_params: returns users were found by params.
-    """
-    return User.objects.filter(**kwargs)
 
 
 def send_verification_link(link: str, email: str) -> None:

@@ -19,5 +19,5 @@ router.register(prefix='tags', viewset=views.TagViewSet, basename='tags')
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('search/', views.search),
+    path('search/', views.UserPageFilter.as_view()),
 ]
