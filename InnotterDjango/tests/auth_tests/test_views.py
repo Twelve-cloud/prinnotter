@@ -20,7 +20,7 @@ class TestAuthViews:
 
     def test_refresh(self, api_factory, refresh_token):
         request = api_factory.get('')
-        
+
         response = refresh_view(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
