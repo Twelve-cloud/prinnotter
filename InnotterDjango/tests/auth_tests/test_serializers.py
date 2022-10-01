@@ -7,7 +7,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestAuthSerializer:
-    def test_validate(self, blocked_user_json, user_json):
+    def test_validate(self, blocked_user_json, unverif_user_json, user_json):
         with pytest.raises(ValidationError):
             SignInSerializer.validate(..., {'email': None, 'password': ''})
 
@@ -19,6 +19,10 @@ class TestAuthSerializer:
 
         with pytest.raises(ValidationError):
             serializer = SignInSerializer(data=blocked_user_json)
+            serializer.is_valid(raise_exception=True)
+
+        with pytest.raises(ValidationError):
+            serializer = SignInSerializer(data=unverif_user_json)
             serializer.is_valid(raise_exception=True)
 
         serializer = SignInSerializer(data=user_json)

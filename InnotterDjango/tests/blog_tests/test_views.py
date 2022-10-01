@@ -1,4 +1,4 @@
-from blog.views import TagViewSet, PageViewSet, PostViewSet, search
+from blog.views import TagViewSet, PageViewSet, PostViewSet, UserPageFilter
 from rest_framework.permissions import IsAuthenticated
 from blog.models import Page, Post
 from rest_framework import status
@@ -16,8 +16,11 @@ decline_view = PageViewSet.as_view({'patch': 'decline'})
 decline_all_view = PageViewSet.as_view({'patch': 'decline_all'})
 news_view = PageViewSet.as_view({'get': 'news'})
 
+create_view = PostViewSet.as_view({'post': 'create'})
 list_view = PostViewSet.as_view({'get': 'list'})
 like_view = PostViewSet.as_view({'patch': 'like'})
+
+search_view = UserPageFilter.as_view()
 
 
 class TestTagViewSet:
@@ -141,6 +144,18 @@ class TestPostViewSet:
         posts = PostViewSet.get_queryset(mock)
         assert len(posts) == 1
 
+    def test_create(self, api_factory, post_json, mocker, postperm):
+        request = api_factory.post('', post_json, format='json')
+
+        request.build_absolute_uri = mocker.MagicMock()
+        send_notification = mocker.MagicMock()
+        mocker.patch('blog.views.send_notification_to_followers', send_notification)
+        response = create_view(request, parent_lookup_page_id=post_json['page'])
+
+        request.build_absolute_uri.assert_called_once()
+        send_notification.assert_called_once()
+        response.status_code == status.HTTP_200_OK
+
     def test_list(self, api_factory, page, mocker, postperm):
         mock = mocker.MagicMock()
         mock.kwargs = {'parent_lookup_page_id': page.id}
@@ -161,18 +176,18 @@ class TestPostViewSet:
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestSearch:
+class TestUserPageFilter:
     def test_search(self, api_factory, user, page):
         request = api_factory.get('/api/v1/blog/search/')
         request.user = user
 
-        response = search(request)
-        assert response.data == 'GET params are not valid'
+        response = search_view(request)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         request.GET = {'type': 'user', 'username': user.username}
-        response = search(request)
+        response = search_view(request)
         assert response.data[0]['username'] == user.username
 
         request.GET = {'type': 'page', 'name': page.name}
-        response = search(request)
+        response = search_view(request)
         assert response.data[0]['name'] == page.name

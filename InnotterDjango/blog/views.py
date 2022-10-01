@@ -272,7 +272,6 @@ class UserPageFilter(generics.ListAPIView):
             self.serializer_class = PageSerializer
             return Page.objects.filter(**params)
         elif type == 'user' and set(params).issubset(self.acceptable_user_params):
-            print('here', params)
             self.serializer_class = UserSerializer
             return User.objects.filter(**params)
         else:

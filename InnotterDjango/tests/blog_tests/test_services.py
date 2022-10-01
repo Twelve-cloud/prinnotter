@@ -2,8 +2,9 @@ from blog.services import (
     set_blocking, follow_page, like_or_unlike_post,
     add_user_to_followers, add_all_users_to_followers,
     remove_user_from_requests, remove_all_users_from_requests,
-    search_pages_by_params
+    send_notification_to_followers
 )
+from InnotterDjango.tasks import send_notification_about_new_post
 from django.http import Http404
 import pytest
 
@@ -86,6 +87,10 @@ class TestBlogServices:
         assert len(page.follow_requests.all()) == 0
         assert len(page.followers.all()) == 0
 
-    def test_search_pages_by_params(self, page):
-        pages = search_pages_by_params(name=page.name)
-        assert page in pages
+    def test_send_notification_to_followers(self, mocker, post):
+        send_notification = mocker.MagicMock()
+
+        mocker.patch.object(send_notification_about_new_post, 'delay', send_notification)
+        send_notification_to_followers(post.page.id, '')
+
+        send_notification.assert_called_once()

@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-IS_HEROKU = "DYNO" in os.environ
+IS_HEROKU = 'DYNO' in os.environ
 
 if IS_HEROKU:
     DEBUG = False
@@ -18,7 +18,7 @@ else:
     DEBUG = os.getenv('DEBUG')
 
 if IS_HEROKU:
-    ALLOWED_HOSTS = ["*"]
+    ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 

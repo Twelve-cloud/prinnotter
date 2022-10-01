@@ -29,6 +29,15 @@ def user_json(user):
 
 
 @pytest.fixture()
+def post_json(page):
+    post = baker.prepare(Post, page=page)
+    return {
+        'page': post.page.id,
+        'content': post.content
+    }
+
+
+@pytest.fixture()
 def pageperm(mocker):
     mock = mocker.MagicMock(return_value=True)
     mocker.patch.object(PageViewSet, 'check_permissions', mock)

@@ -13,5 +13,5 @@ class AWSMeta(type):
                 region_name=settings.AWS_REGION_NAME if settings.AWS_REGION_NAME else 'us-west-2'
             )
         else:
-            raise 'Fatal error: service_name must be specified!'
+            raise Exception('Fatal error: service_name must be specified!')
         return type.__new__(meta, classname, supers, classdict)
