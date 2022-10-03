@@ -9,8 +9,10 @@ from blog.services import (
     remove_user_from_requests, remove_all_users_from_requests,
     send_notification_to_followers
 )
+from InnotterDjango.services import add_image_to_s3_bucket, add_url_to_request
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
+from InnotterDjango.aws_s3_client import S3Client
 from user.permissions import IsAdminOrModerator
 from django.shortcuts import get_object_or_404
 from blog.exceptions import InvalidFilterType
@@ -132,6 +134,25 @@ class PageViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        if 'image' in request.FILES:
+            image = request.FILES.get('image')
+            folder = request.user.username + '/pages/' + request.data.get('uuid')
+            add_image_to_s3_bucket(image, folder)
+            url = S3Client.create_url(folder + '/' + image.name)
+            add_url_to_request(url, request)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if 'image' in request.FILES:
+            image = request.FILES.get('image')
+            page = Page.objects.get(pk=kwargs.get('pk'))
+            folder = request.user.username + '/pages/' + page.uuid
+            add_image_to_s3_bucket(image, folder)
+            url = S3Client.create_url(folder + '/' + image.name)
+            add_url_to_request(url, request)
+        return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):

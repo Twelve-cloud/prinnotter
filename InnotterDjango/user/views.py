@@ -4,8 +4,10 @@ from user.permissions import (
 from user.services import (
     set_blocking, block_all_users_pages, send_verification_link
 )
+from InnotterDjango.services import add_image_to_s3_bucket, add_url_to_request
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import AnonymousUser
+from InnotterDjango.aws_s3_client import S3Client
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -66,7 +68,16 @@ class UserViewSet(viewsets.ModelViewSet):
         if isinstance(request.user, AnonymousUser):
             link = request.build_absolute_uri(reverse('jwt-verify-email'))
             send_verification_link(link, request.data['email'])
-        return super().create(request, args, kwargs)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if 'image' in request.FILES:
+            image = request.FILES.get('image')
+            folder = request.user.username + '/avatar'
+            add_image_to_s3_bucket(image, folder)
+            url = S3Client.create_url(folder + '/' + image.name)
+            add_url_to_request(url, request)
+        return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
