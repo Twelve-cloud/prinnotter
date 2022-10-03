@@ -70,6 +70,9 @@ def get_payload_by_token(token: str) -> Optional[dict]:
 
 
 def verify_user(email: str) -> None:
+    """
+    verify_user: verify user if it exists, otherwise raise 404 error.
+    """
     user = get_object_or_404(User, email=email)
     user.is_verified = True
     user.save()
