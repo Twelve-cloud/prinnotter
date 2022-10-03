@@ -1,5 +1,7 @@
 from blog.views import TagViewSet, PageViewSet, PostViewSet, UserPageFilter
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.permissions import IsAuthenticated
+from InnotterDjango.aws_s3_client import S3Client
 from blog.models import Page, Post
 from rest_framework import status
 import pytest
@@ -7,6 +9,8 @@ import pytest
 
 pytestmark = pytest.mark.django_db
 
+page_create_view = PageViewSet.as_view({'post': 'create'})
+update_view = PageViewSet.as_view({'patch': 'update'})
 block_view = PageViewSet.as_view({'patch': 'block'})
 follow_view = PageViewSet.as_view({'patch': 'follow'})
 requests_view = PageViewSet.as_view({'get': 'requests'})
@@ -16,7 +20,7 @@ decline_view = PageViewSet.as_view({'patch': 'decline'})
 decline_all_view = PageViewSet.as_view({'patch': 'decline_all'})
 news_view = PageViewSet.as_view({'get': 'news'})
 
-create_view = PostViewSet.as_view({'post': 'create'})
+post_create_view = PostViewSet.as_view({'post': 'create'})
 list_view = PostViewSet.as_view({'get': 'list'})
 like_view = PostViewSet.as_view({'patch': 'like'})
 
@@ -35,6 +39,34 @@ class TestPageViewSet:
         self = PageViewSet()
         self.action = 'list'
         assert isinstance(self.get_permissions()[0], IsAuthenticated) is True
+
+    def test_create(self, api_factory, admin, mocker, pageperm):
+        file = SimpleUploadedFile('file.txt', b'', content_type='text/plain')
+        request = api_factory.post('', {'image': file, 'uuid': ''}, format='multipart')
+        request.user = admin
+
+        mock = mocker.MagicMock()
+        mocker.patch('blog.views.add_image_to_s3_bucket', mock)
+        mocker.patch('blog.views.add_url_to_request', mock)
+        mocker.patch.object(S3Client, 'create_url', mock)
+        response = page_create_view(request)
+
+        assert mock.call_count == 3
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_update(self, api_factory, admin, page, mocker, pageperm):
+        file = SimpleUploadedFile('file.txt', b'', content_type='text/plain')
+        request = api_factory.patch('', {'image': file}, format='multipart')
+        request.user = admin
+
+        mock = mocker.MagicMock()
+        mocker.patch('blog.views.add_image_to_s3_bucket', mock)
+        mocker.patch('blog.views.add_url_to_request', mock)
+        mocker.patch.object(S3Client, 'create_url', mock)
+        response = update_view(request, **{'pk': page.pk})
+
+        assert mock.call_count == 3
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_block(self, api_factory, page, block_json, pageperm):
         request = api_factory.patch('', block_json, format='json')
@@ -150,7 +182,7 @@ class TestPostViewSet:
         request.build_absolute_uri = mocker.MagicMock()
         send_notification = mocker.MagicMock()
         mocker.patch('blog.views.send_notification_to_followers', send_notification)
-        response = create_view(request, parent_lookup_page_id=post_json['page'])
+        response = post_create_view(request, parent_lookup_page_id=post_json['page'])
 
         request.build_absolute_uri.assert_called_once()
         send_notification.assert_called_once()

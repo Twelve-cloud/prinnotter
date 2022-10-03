@@ -12,7 +12,6 @@ def add_image_to_s3_bucket(image, folder):
 
     if is_valid:
         S3Client.upload_file(image, folder + '/' + image.name)
-        pass
     else:
         raise InvalidImageExtenstion()
 

@@ -1,6 +1,6 @@
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from InnotterDjango.aws_metaclass import AWSMeta
 from InnotterDjango.exceptions import BucketDoesNotExist
+from InnotterDjango.aws_metaclass import AWSMeta
 from botocore.exceptions import ClientError
 from django.conf import settings
 import io
@@ -41,4 +41,4 @@ class S3Client(metaclass=AWSMeta):
             )
             return url
         except ClientError:
-            return BucketDoesNotExist()
+            raise BucketDoesNotExist()
