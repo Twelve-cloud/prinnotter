@@ -27,6 +27,9 @@ def validate_image(image_name: str):
 
 
 def add_url_to_request(url: str, request: HttpRequest) -> None:
+    """
+    add_url_to_request: added url to request data.
+    """
     if isinstance(request.data, QueryDict):
         request.data._mutable = True
         request.data['image'] = url
