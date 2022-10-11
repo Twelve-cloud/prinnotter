@@ -36,13 +36,25 @@ def blocked_user_json():
 
 
 @pytest.fixture()
-def user_json():
-    user = baker.prepare(User, role='u')
+def unverif_user_json():
+    user = baker.prepare(User, role='u', is_verified=False)
     user.set_password('12341234')
     user.save()
     return {
         'email': user.email,
         'password': '12341234'
+    }
+
+
+@pytest.fixture()
+def user_json():
+    user = baker.prepare(User, role='u', is_verified=True)
+    user.set_password('12341234')
+    user.save()
+    return {
+        'email': user.email,
+        'password': '12341234',
+        'is_verified': user.is_verified
     }
 
 

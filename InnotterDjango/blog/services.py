@@ -1,3 +1,4 @@
+from InnotterDjango.tasks import send_notification_about_new_post
 from django.shortcuts import get_object_or_404
 from blog.models import Page, Post
 from user.models import User
@@ -78,3 +79,13 @@ def remove_all_users_from_requests(page: Page) -> None:
     """
     for user in page.follow_requests.all():
         remove_user_from_requests(page, user.pk)
+
+
+def send_notification_to_followers(parent_page_id: int, posts_url: str) -> None:
+    """
+    send_notification_to_followers: send notification to all followers
+    of a page about new post.
+    """
+    page = Page.objects.get(pk=parent_page_id)
+    user_emails = list(page.followers.values_list('email', flat=True))
+    send_notification_about_new_post.delay(page.name, user_emails, posts_url)

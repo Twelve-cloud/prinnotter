@@ -32,8 +32,13 @@ class User(AbstractUser):
         verbose_name='Blocked?',
     )
 
+    is_verified = models.BooleanField(
+        default=False,
+        verbose_name='Verified?'
+    )
+
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'role']
+    REQUIRED_FIELDS = ['username', 'role', 'is_verified']
 
     class Meta:
         verbose_name = 'User'

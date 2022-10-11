@@ -1,15 +1,19 @@
 from user.permissions import (
     IsNotAuthentificatedOrAdmin, IsUserOwnerOrAdmin, IsAdmin, IsUserOwner
 )
+from user.services import (
+    set_blocking, block_all_users_pages, send_verification_link
+)
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from user.serializers import UserSerializer
 from blog.serializers import PostSerializer
-from user.services import set_blocking
 from rest_framework import viewsets
 from rest_framework import status
+from django.urls import reverse
 from user.models import User
 
 
@@ -53,10 +57,23 @@ class UserViewSet(viewsets.ModelViewSet):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
 
+    def perform_create(self, serializer):
+        user = serializer.context['request'].user
+        is_verified = False if isinstance(user, AnonymousUser) else True
+        serializer.save(is_verified=is_verified)
+
+    def create(self, request, *args, **kwargs):
+        if isinstance(request.user, AnonymousUser):
+            link = request.build_absolute_uri(reverse('jwt-verify-email'))
+            send_verification_link(link, request.data['email'])
+        return super().create(request, args, kwargs)
+
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
         user = get_object_or_404(User, pk=pk)
-        set_blocking(user, request.data.get('is_blocked', False))
+        is_blocked = request.data.get('is_blocked', False)
+        set_blocking(user, is_blocked)
+        block_all_users_pages(user, is_blocked)
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'], serializer_class=PostSerializer)

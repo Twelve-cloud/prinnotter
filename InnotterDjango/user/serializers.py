@@ -36,6 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'password',
             'role',
+            'is_verified',
             'first_name',
             'last_name',
             'image_s3_path',
@@ -47,6 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'id',
+            'is_verified',
             'image_s3_path',
             'is_blocked',
             'pages',

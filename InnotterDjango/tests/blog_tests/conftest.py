@@ -1,5 +1,5 @@
 from blog.views import PageViewSet, PostViewSet
-from blog.models import Tag, Page, Post
+from blog.models import Tag, Post
 from model_bakery import baker
 import pytest
 
@@ -7,11 +7,6 @@ import pytest
 @pytest.fixture()
 def tag():
     return baker.make(Tag)
-
-
-@pytest.fixture()
-def page(user):
-    return baker.make(Page, owner=user)
 
 
 @pytest.fixture()
@@ -30,6 +25,15 @@ def block_json():
 def user_json(user):
     return {
         'user_id': user.id
+    }
+
+
+@pytest.fixture()
+def post_json(page):
+    post = baker.prepare(Post, page=page)
+    return {
+        'page': post.page.id,
+        'content': post.content
     }
 
 

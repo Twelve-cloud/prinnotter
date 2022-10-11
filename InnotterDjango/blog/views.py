@@ -6,17 +6,23 @@ from blog.permissions import (
 from blog.services import (
     set_blocking, follow_page, like_or_unlike_post,
     add_user_to_followers, add_all_users_to_followers,
-    remove_user_from_requests, remove_all_users_from_requests
+    remove_user_from_requests, remove_all_users_from_requests,
+    send_notification_to_followers
 )
 from blog.serializers import TagSerializer, PageSerializer, PostSerializer
 from rest_framework.permissions import IsAuthenticated
 from user.permissions import IsAdminOrModerator
 from django.shortcuts import get_object_or_404
+from blog.exceptions import InvalidFilterType
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from user.serializers import UserSerializer
 from rest_framework import viewsets, mixins
 from blog.models import Tag, Page, Post
+from rest_framework import generics
 from rest_framework import status
+from user.models import User
+from itertools import chain
 
 
 class TagViewSet(mixins.CreateModelMixin,
@@ -118,6 +124,9 @@ class PageViewSet(viewsets.ModelViewSet):
             IsPageNotBlocked,
             IsPagePrivate
         ),
+        'search': (
+            IsAuthenticated,
+        )
     }
 
     def get_permissions(self):
@@ -172,6 +181,14 @@ class PageViewSet(viewsets.ModelViewSet):
         remove_all_users_from_requests(page)
         return Response('Success', status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'])
+    def news(self, request):
+        pages = request.user.pages.all() | request.user.follows.all()
+        posts = list(chain(*[page.posts.all() for page in pages]))
+        posts.sort(key=lambda post: post.created_at, reverse=True)
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
@@ -222,6 +239,12 @@ class PostViewSet(viewsets.ModelViewSet):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
 
+    def create(self, request, *args, **kwargs):
+        parent_page_id = self.kwargs.get('parent_lookup_page_id')
+        posts_url = request.build_absolute_uri()
+        send_notification_to_followers(parent_page_id, posts_url)
+        return super().create(request, args, kwargs)
+
     def list(self, request, *args, **kwargs):
         parent_page_id = self.kwargs.get('parent_lookup_page_id')
         page = get_object_or_404(Page, pk=parent_page_id)
@@ -235,3 +258,21 @@ class PostViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(request, page)
         like_or_unlike_post(post, request.user)
         return Response('Success', status=status.HTTP_200_OK)
+
+
+class UserPageFilter(generics.ListAPIView):
+    acceptable_page_params = {'name', 'uuid', 'tags'}
+    acceptable_user_params = {'username', 'first_name', 'last_name'}
+
+    def get_queryset(self):
+        params = {key: value for key, value in self.request.GET.items()}
+        type = params.pop('type', None)
+
+        if type == 'page' and set(params).issubset(self.acceptable_page_params):
+            self.serializer_class = PageSerializer
+            return Page.objects.filter(**params)
+        elif type == 'user' and set(params).issubset(self.acceptable_user_params):
+            self.serializer_class = UserSerializer
+            return User.objects.filter(**params)
+        else:
+            raise InvalidFilterType()

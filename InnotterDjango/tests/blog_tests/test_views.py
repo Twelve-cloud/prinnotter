@@ -1,4 +1,4 @@
-from blog.views import TagViewSet, PageViewSet, PostViewSet
+from blog.views import TagViewSet, PageViewSet, PostViewSet, UserPageFilter
 from rest_framework.permissions import IsAuthenticated
 from blog.models import Page, Post
 from rest_framework import status
@@ -14,23 +14,27 @@ accept_view = PageViewSet.as_view({'patch': 'accept'})
 accept_all_view = PageViewSet.as_view({'patch': 'accept_all'})
 decline_view = PageViewSet.as_view({'patch': 'decline'})
 decline_all_view = PageViewSet.as_view({'patch': 'decline_all'})
+news_view = PageViewSet.as_view({'get': 'news'})
 
+create_view = PostViewSet.as_view({'post': 'create'})
 list_view = PostViewSet.as_view({'get': 'list'})
 like_view = PostViewSet.as_view({'patch': 'like'})
+
+search_view = UserPageFilter.as_view()
 
 
 class TestTagViewSet:
     def test_get_permissions(self):
         self = TagViewSet()
         self.action = 'list'
-        self.get_permissions() is IsAuthenticated
+        assert isinstance(self.get_permissions()[0], IsAuthenticated) is True
 
 
 class TestPageViewSet:
     def test_get_permissions(self):
         self = PageViewSet()
         self.action = 'list'
-        self.get_permissions() is IsAuthenticated
+        assert isinstance(self.get_permissions()[0], IsAuthenticated) is True
 
     def test_block(self, api_factory, page, block_json, pageperm):
         request = api_factory.patch('', block_json, format='json')
@@ -108,12 +112,25 @@ class TestPageViewSet:
         assert len(page.followers.all()) == 0
         assert response.status_code == status.HTTP_200_OK
 
+    def test_news(self, api_factory, user, moder, page, post):
+        request = api_factory.get('/api/v1/blog/pages/news/')
+
+        request.user = user
+        user.pages.add(page)
+        response = news_view(request)
+        assert response.data[0]['id'] == post.id
+
+        request.user = moder
+        moder.follows.add(page)
+        response = news_view(request)
+        assert response.data[0]['id'] == post.id
+
 
 class TestPostViewSet:
     def test_get_permissions(self):
         self = PostViewSet()
         self.action = 'list'
-        self.get_permissions() is IsAuthenticated
+        assert isinstance(self.get_permissions()[0], IsAuthenticated) is True
 
     def test_get_queryset(self, page, mocker):
         mock = mocker.MagicMock()
@@ -126,6 +143,18 @@ class TestPostViewSet:
 
         posts = PostViewSet.get_queryset(mock)
         assert len(posts) == 1
+
+    def test_create(self, api_factory, post_json, mocker, postperm):
+        request = api_factory.post('', post_json, format='json')
+
+        request.build_absolute_uri = mocker.MagicMock()
+        send_notification = mocker.MagicMock()
+        mocker.patch('blog.views.send_notification_to_followers', send_notification)
+        response = create_view(request, parent_lookup_page_id=post_json['page'])
+
+        request.build_absolute_uri.assert_called_once()
+        send_notification.assert_called_once()
+        response.status_code == status.HTTP_200_OK
 
     def test_list(self, api_factory, page, mocker, postperm):
         mock = mocker.MagicMock()
@@ -145,3 +174,20 @@ class TestPostViewSet:
 
         assert len(post.users_liked.all()) == 1
         assert response.status_code == status.HTTP_200_OK
+
+
+class TestUserPageFilter:
+    def test_search(self, api_factory, user, page):
+        request = api_factory.get('/api/v1/blog/search/')
+        request.user = user
+
+        response = search_view(request)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        request.GET = {'type': 'user', 'username': user.username}
+        response = search_view(request)
+        assert response.data[0]['username'] == user.username
+
+        request.GET = {'type': 'page', 'name': page.name}
+        response = search_view(request)
+        assert response.data[0]['name'] == page.name

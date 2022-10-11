@@ -1,7 +1,8 @@
 from jwt_auth.services import (
-    generate_token, set_tokens_to_cookie, get_payload_by_token
+    generate_token, set_tokens_to_cookie, get_payload_by_token, verify_user
 )
 from rest_framework.response import Response
+from user.models import User
 import pytest
 
 
@@ -30,3 +31,9 @@ class TestAuthServices:
         assert access_payload['sub'] == access_user_id
         assert refresh_payload['sub'] == refresh_user_id
         assert get_payload_by_token('failed_token') is None
+
+    def test_verify_user(self, user):
+        assert user.is_verified is False
+        verify_user(user.email)
+        user = User.objects.get(pk=user.id)
+        assert user.is_verified is True
