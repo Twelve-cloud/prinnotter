@@ -14,11 +14,11 @@ class User(AbstractUser):
         verbose_name='Email',
     )
 
-    image_s3_path = models.CharField(
+    image = models.CharField(
         max_length=200,
         null=True,
         blank=True,
-        verbose_name='PathToImage',
+        verbose_name='Image',
     )
 
     role = models.CharField(

@@ -4,7 +4,16 @@ import boto3
 
 
 class AWSMeta(type):
+    """
+    AWSMeta: metaclass, which must be added to all AWS clients classes.
+    Automatically provides aws credentials for every AWS client class.
+    """
     def __new__(meta, classname: str, supers: tuple, classdict: dict) -> NewType:
+        """
+        __new__: Automatically provides aws credentials for every
+        AWS client class and checks if service_name in class or not
+        after that creates class object.
+        """
         if 'service_name' in classdict:
             classdict['client'] = boto3.client(
                 classdict['service_name'],

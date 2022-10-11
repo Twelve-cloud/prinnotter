@@ -3,10 +3,21 @@ from django.conf import settings
 
 
 class SESClient(metaclass=AWSMeta):
+    """
+    SESClient: class which represents access to SES service with extra
+    functionality to maintain innotter.
+    """
     service_name = 'ses'
 
     @classmethod
     def send_email_about_new_post(cls, page_name: str, emails: list, posts_url: str) -> None:
+        """
+        send_email_about_new_post: sends notification to subscriber's email
+        about new post.
+            1) page_name - name of page where was created a new post;
+            2) emails - list of subscribers' emails;
+            3) posts_url - url to posts of the page.
+        """
         cls.client.send_email(
             Source=settings.AWS_MAIL_SENDER,
             Destination={
@@ -33,6 +44,11 @@ class SESClient(metaclass=AWSMeta):
 
     @classmethod
     def send_email_to_verify_account(cls, email: str, verify_url: str) -> None:
+        """
+        send_email_to_verify_account: sends email to verify user registration.
+            1) email - email which user specify when registering.
+            2) verify_url - url which verify user's account.
+        """
         cls.client.send_email(
             Source=settings.AWS_MAIL_SENDER,
             Destination={
