@@ -1,6 +1,9 @@
-start: docker-compose.yaml
-	sudo docker-compose build
-	sudo docker-compose up
+test:
+	cd InnotterDjango && poetry run pytest
+	cd InnotterDjango && flake8 .
 
-test: docker-compose.yaml
-	sudo docker-compose exec web poetry run pytest
+build: docker-compose.yml
+	sudo docker compose build
+
+deploy:
+	sudo docker compose up

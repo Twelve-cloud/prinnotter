@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 from django.conf import settings
-from user.models import User
 from typing import Optional
 import jwt
 

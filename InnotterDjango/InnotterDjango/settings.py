@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from pathlib import Path
+import dj_database_url
 import os
 
 
@@ -7,11 +8,19 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+IS_HEROKU = "DYNO" in os.environ
+
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = os.getenv('DEBUG')
+if IS_HEROKU:
+    DEBUG = False
+else:
+    DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+if IS_HEROKU:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -61,15 +70,21 @@ WSGI_APPLICATION = 'InnotterDjango.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
+        'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.getenv('POSTGRES_DB', 'innotter_db'),
         'HOST': os.getenv('POSTGRES_HOST'),
         'PORT': os.getenv('POSTGRES_PORT'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE'))
+        'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE', '0'))
     }
 }
+
+if "DATABASE_URL" in os.environ:
+    DATABASES["default"] = dj_database_url.config(
+        conn_max_age=int(os.getenv('CONN_MAX_AGE', '0')),
+        ssl_require=True
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {

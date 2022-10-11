@@ -1,7 +1,13 @@
 from jwt_auth.services import generate_token
+from django.conf import settings
 from model_bakery import baker
 from user.models import User
 import pytest
+
+
+@pytest.fixture(scope='session', autouse=True)
+def secret_key():
+    settings.SECRET_KEY = 'SECRET_KEY'
 
 
 @pytest.fixture()
