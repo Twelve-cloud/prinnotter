@@ -230,7 +230,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def like(self, request, parent_lookup_page_id=None, pk=None):
-        page = get_object_or_404(Page, pk=parent_page_id)
+        page = get_object_or_404(Page, pk=parent_lookup_page_id)
         post = get_object_or_404(Post, pk=pk)
         self.check_object_permissions(request, page)
         like_or_unlike_post(post, request.user)
