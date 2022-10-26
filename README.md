@@ -1,2 +1,2 @@
 # Innotter
-Innowise Trainee task
+Innowise Innotter Trainee task
